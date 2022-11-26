@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/RedLabsPlatform/kube-shield/pkg/config"
+	"github.com/RedLabsPlatform/kube-shield/pkg/server"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -88,5 +89,11 @@ func start(cmd *cobra.Command, args []string) {
 	if err != nil {
 		logrus.Fatalf("config validation failed: %v", err)
 	}
+
+	srv, err := server.NewServer(cfg)
+	if err != nil {
+		logrus.Fatalf("cannot create new server instance: %v", err)
+	}
+	srv.Run()
 
 }
