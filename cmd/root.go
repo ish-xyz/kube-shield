@@ -12,6 +12,7 @@ import (
 
 var (
 	printVersion bool
+	configFile   string
 	Version      = "unset" // set at build time
 	Cmd          = &cobra.Command{
 		Use:   "kube-shield",
@@ -27,22 +28,33 @@ func Execute() error {
 func init() {
 	// Non Bound Flags
 	Cmd.Flags().BoolVarP(&printVersion, "version", "v", false, "Print version of kube-shield")
-	Cmd.Flags().StringP("config", "c", "", "Kube-shield configuration file")
+	Cmd.Flags().StringVarP(&configFile, "config", "c", "", "Kube-shield configuration file")
 
 	// Bound Flags
 	Cmd.Flags().StringP("policies", "p", "", "Path to the directory with the policies")
-	Cmd.Flags().StringP("metrics-address", "m", "", "Address where the metrics are exposed")
+	Cmd.Flags().String("web-address", "0.0.0.0:8000", "Address where the webhook webserver is exposed")
+	Cmd.Flags().String("web-path", "/webhook", "Path where the webhook webserver is reachable")
+	Cmd.Flags().String("tls-key", "/etc/kube-shield/tls/key.pem", "Path to the tls private key")
+	Cmd.Flags().String("tls-cert", "/etc/kube-shield/tls/cert.pem", "Path to the tls certificate")
+	Cmd.Flags().String("metrics-address", "0.0.0.0:3000", "Address where the metrics are exposed")
+	Cmd.Flags().String("metrics-path", "/metrics", "Path where the metrics are exposed")
 	Cmd.Flags().BoolP("register-webhook", "r", true, "create ValidatingWebhookConfiguration resource in the current Kubernetes")
 	Cmd.Flags().BoolP("debug", "d", false, "Path to the directory with the policies")
 
 	// Required flags
 	Cmd.MarkFlagRequired("policies")
 
+	viper.BindPFlag("web.address", Cmd.Flags().Lookup("web-address"))
+	viper.BindPFlag("web.path", Cmd.Flags().Lookup("web-path"))
+	viper.BindPFlag("web.tls.key", Cmd.Flags().Lookup("tls-key"))
+	viper.BindPFlag("web.tls.cert", Cmd.Flags().Lookup("tls-cert"))
+
 	viper.BindPFlag("policies", Cmd.Flags().Lookup("policies"))
-	viper.BindPFlag("metrics.address", Cmd.Flags().Lookup("metrics-address"))
-	viper.BindPFlag("registerWebhook", Cmd.Flags().Lookup("register-webhook"))
+	viper.BindPFlag("register", Cmd.Flags().Lookup("register-webhook"))
 	viper.BindPFlag("debug", Cmd.Flags().Lookup("debug"))
-	
+	viper.BindPFlag("metrics.address", Cmd.Flags().Lookup("metrics-address"))
+	viper.BindPFlag("metrics.path", Cmd.Flags().Lookup("metrics-path"))
+
 }
 
 // Start the admission controller here
@@ -53,11 +65,23 @@ func start(cmd *cobra.Command, args []string) {
 		os.Exit(0)
 	}
 
+	if configFile != "" {
+		viper.SetConfigFile(configFile)
+		if viper.ReadInConfig() != nil {
+			logrus.Fatal("error loading configuration")
+		}
+	}
+
 	cfg := config.NewConfig(
 		viper.GetString("policies"),
-		viper.GetBool("registerWebhook"),
+		viper.GetString("web.address"),
+		viper.GetString("web.path"),
+		viper.GetString("web.tls.key"),
+		viper.GetString("web.tls.cert"),
+		viper.GetBool("register"),
 		viper.GetBool("debug"),
 		viper.GetString("metrics.address"),
+		viper.GetString("metrics.path"),
 	)
 
 	err := cfg.Validate()
