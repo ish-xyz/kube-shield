@@ -1,2 +1,2 @@
 # kube-shield
-A dynamic multi purpose Admission Webhook 
+A dynamic multi purpose admission webhook 
