@@ -31,15 +31,18 @@ func init() {
 
 	// Bound Flags
 	Cmd.Flags().StringP("policies", "p", "", "Path to the directory with the policies")
-	Cmd.Flags().StringP("metricsAddress", "m", "", "Address where the metrics are exposed")
-	Cmd.Flags().BoolP("registerWebhook", "r", true, "create ValidatingWebhookConfiguration resource in the current Kubernetes")
+	Cmd.Flags().StringP("metrics-address", "m", "", "Address where the metrics are exposed")
+	Cmd.Flags().BoolP("register-webhook", "r", true, "create ValidatingWebhookConfiguration resource in the current Kubernetes")
 	Cmd.Flags().BoolP("debug", "d", false, "Path to the directory with the policies")
 
 	// Required flags
 	Cmd.MarkFlagRequired("policies")
 
 	viper.BindPFlag("policies", Cmd.Flags().Lookup("policies"))
+	viper.BindPFlag("metrics.address", Cmd.Flags().Lookup("metrics-address"))
+	viper.BindPFlag("registerWebhook", Cmd.Flags().Lookup("register-webhook"))
 	viper.BindPFlag("debug", Cmd.Flags().Lookup("debug"))
+	
 }
 
 // Start the admission controller here
@@ -54,7 +57,7 @@ func start(cmd *cobra.Command, args []string) {
 		viper.GetString("policies"),
 		viper.GetBool("registerWebhook"),
 		viper.GetBool("debug"),
-		viper.GetString("metricsAddress"),
+		viper.GetString("metrics.address"),
 	)
 
 	err := cfg.Validate()
