@@ -36,5 +36,8 @@ func NewServer(cfg *config.Config) (*Server, error) {
 func (s *Server) Run() error {
 
 	fmt.Printf("+%v", s)
-	return nil
+
+	// run tls server
+	err := s.Http.ListenAndServeTLS("", "")
+	return err
 }
