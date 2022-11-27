@@ -40,7 +40,7 @@ func init() {
 	Cmd.Flags().String("metrics-address", "0.0.0.0:3000", "Address where the metrics are exposed")
 	Cmd.Flags().String("metrics-path", "/metrics", "Path where the metrics are exposed")
 	Cmd.Flags().BoolP("register-webhook", "r", true, "create ValidatingWebhookConfiguration resource in the current Kubernetes")
-	Cmd.Flags().BoolP("debug", "d", false, "Path to the directory with the policies")
+	Cmd.Flags().BoolP("debug", "d", false, "debug mode")
 
 	// Required flags
 	Cmd.MarkFlagRequired("policies")
