@@ -1,10 +1,10 @@
 package server
 
 import (
-	"bytes"
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 
 	"github.com/RedLabsPlatform/kube-shield/pkg/config"
@@ -41,16 +41,15 @@ func (s *Server) Run() error {
 
 	fmt.Printf("+%v", s)
 
-	http.HandleFunc("/validate-pods", ServeValidatePods)
+	http.HandleFunc("/validate", ServeValidate)
 
 	// run tls server
 	err := s.Http.ListenAndServeTLS("", "")
 	return err
 }
 
-// ServeValidatePods validates an admission request and then writes an admission
-// review to `w`
-func ServeValidatePods(w http.ResponseWriter, r *http.Request) {
+// ServeValidatePods validates an admission request and then writes an admission review to `w`
+func ServeValidate(w http.ResponseWriter, r *http.Request) {
 	logger := logrus.WithField("uri", r.RequestURI)
 	logger.Debug("received validation request")
 
@@ -94,20 +93,18 @@ func ServeValidatePods(w http.ResponseWriter, r *http.Request) {
 
 // parseRequest extracts an AdmissionReview from an http.Request if possible
 func parseRequest(r http.Request) (*admissionv1.AdmissionReview, error) {
+
+	var a admissionv1.AdmissionReview
+
 	if r.Header.Get("Content-Type") != "application/json" {
 		return nil, fmt.Errorf("Content-Type: %q should be %q",
 			r.Header.Get("Content-Type"), "application/json")
 	}
 
-	bodybuf := new(bytes.Buffer)
-	bodybuf.ReadFrom(r.Body)
-	body := bodybuf.Bytes()
-
-	if len(body) == 0 {
-		return nil, fmt.Errorf("admission request body is empty")
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		return nil, fmt.Errorf("can't read body request")
 	}
-
-	var a admissionv1.AdmissionReview
 
 	if err := json.Unmarshal(body, &a); err != nil {
 		return nil, fmt.Errorf("could not parse admission review request: %v", err)
