@@ -59,7 +59,7 @@ spec:
               - defaultBehaviour
               - applyOn
               - policies
-  scope: Namespaced
+  scope: Cluster
   names:
     plural: clusterpolicies
     singular: clusterpolicy
