@@ -17,7 +17,7 @@ spec:
               properties:
                 defaultBehaviour:
                   type: string
-                  pattern: '^(DenyAll|AllowAll)$'
+                  pattern: '^(IfMatchDeny|IfMatchAllow)$'
                 applyOn:
                   type: object
                   properties:

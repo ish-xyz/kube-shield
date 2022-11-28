@@ -4,14 +4,13 @@ kind: Policy #or Policy
 metadata:
   name: some-random-policy
 spec:
-  defaultBehaviour: DenyAll # or allowAll
   applyOn:
     apiVersions:
     - v1
     kinds:
     - Pod
+  defaultBehaviour: IfMatchDeny
   policies:
-
   - name: rule-name
     rules:
     - key: $input.metadata.namespace
@@ -21,9 +20,7 @@ spec:
     - key: $input.spec.containers[_].resources.limits.memory
       operator: NotEqual
       value: $input.spec.container[_].resources.requests.memory
-
   # OR
-
   - name: second-rule-name
     rules:
     - key: $input.metadata.namespace
