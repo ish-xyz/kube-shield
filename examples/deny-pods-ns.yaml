@@ -1,0 +1,34 @@
+# Allowed operators: Equal, NotEqual, Regex, GreaterThan, LowerThan
+apiVersion: kube-shield.redlabs.co.uk/v1
+kind: ClusterPolicy #or Policy
+metadata:
+  name: some-random-policy
+spec:
+  defaultBehaviour: denyAll # or allowAll
+  applyOn:
+    apiVersion: v1
+    kind:
+    - Pod
+  policies:
+
+  - name: RuleName
+    rules:
+    - field: $input.metadata.namespace
+      operator: Regex
+      value: ^(kube-system|default)$
+    # AND
+    - field: $input.spec.containers[_].resources.limits.memory
+      operator: NotEqual
+      value: $input.spec.container[_].resources.requests.memory
+
+  # OR
+
+  - name: SecondRuleName
+    rules:
+    - field: $input.metadata.namespace
+      operator: Regex
+      value: ^(kube-system|default)$
+    # AND
+    - field: $input.spec.containers[_].resources.limits.memory
+      operator: NotEqual
+      value: $input.spec.container[_].resources.requests.memory
