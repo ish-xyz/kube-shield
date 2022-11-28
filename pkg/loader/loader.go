@@ -35,7 +35,7 @@ func (l *Loader) GetClusterPolicies(ctx context.Context) (*unstructured.Unstruct
 }
 
 // List Policies (Namespaced resource)
-func (l *Loader) GetPolicies(ctx context.Context, kind string, namespace string) (*unstructured.UnstructuredList, error) {
+func (l *Loader) GetPolicies(ctx context.Context, namespace string) (*unstructured.UnstructuredList, error) {
 	if namespace == "" {
 		namespace = defaults.DEFAULT_NS
 	}
