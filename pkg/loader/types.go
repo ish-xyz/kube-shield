@@ -1,13 +1,18 @@
 package loader
 
-/*
-  Use controller-gen to generate the CRDs
-  https://github.com/kubernetes-sigs/controller-tools
-*/
-
 import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/client-go/dynamic"
+	"k8s.io/client-go/kubernetes"
+	"k8s.io/client-go/rest"
 )
+
+// KubernetesClient
+type Loader struct {
+	KubeClient    *kubernetes.Clientset
+	KubeDynClient dynamic.Interface
+	KubeConfig    *rest.Config
+}
 
 // Policy resource definition
 type Policy struct {
