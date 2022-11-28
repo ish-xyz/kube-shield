@@ -41,17 +41,17 @@ spec:
                         type: string
                         pattern: '^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$'
                       rules:
-                        type: object
-                        properties:
-                          key:
-                            type: string
-                          operator:
-                            type: string
-                            pattern: '^(GreaterThan|LowerThan|Equal|NotEqual|Regex)$'
-                          value:
-                            type: string
-                      selectors:
-                        x-kubernetes-preserve-unknown-fields: true
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            key:
+                              type: string
+                            operator:
+                              type: string
+                              pattern: '^(GreaterThan|LowerThan|Equal|NotEqual|Regex)$'
+                            value:
+                              type: string
                     required:
                     - rules
                     - name

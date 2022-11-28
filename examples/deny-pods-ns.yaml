@@ -1,13 +1,14 @@
 # Allowed operators: Equal, NotEqual, Regex, GreaterThan, LowerThan
-apiVersion: kube-shield.redlabs.co.uk/v1
-kind: ClusterPolicy #or Policy
+apiVersion: kube-shield.red-labs.co.uk/v1
+kind: Policy #or Policy
 metadata:
   name: some-random-policy
 spec:
-  defaultBehaviour: denyAll # or allowAll
+  defaultBehaviour: DenyAll # or allowAll
   applyOn:
-    apiVersion: v1
-    kind:
+    apiVersions:
+    - v1
+    kinds:
     - Pod
   policies:
 
