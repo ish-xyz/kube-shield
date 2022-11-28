@@ -12,6 +12,7 @@ type Loader struct {
 	KubeClient    *kubernetes.Clientset
 	KubeDynClient dynamic.Interface
 	KubeConfig    *rest.Config
+	// TODO: Add other required data
 }
 
 // Policy resource definition
