@@ -26,15 +26,7 @@ func NewClusterPolicyLoader(clientset dynamic.Interface) *ClusterPolicyLoader {
 	return clusterPolicyLoader
 }
 
-func (l ClusterPolicyLoader) RegisterHandler(handler cache.ResourceEventHandler) {
-	l.Informer.AddEventHandler(handler)
-}
-
-func (l ClusterPolicyLoader) Run(stopCh <-chan struct{}) {
-	l.Informer.Run(stopCh)
-}
-
-func (l ClusterPolicyLoader) List() []*unstructured.Unstructured {
+func (l *ClusterPolicyLoader) List() []*unstructured.Unstructured {
 	objList := l.Informer.GetStore().List()
 	cplList := make([]*unstructured.Unstructured, len(objList))
 	for idx, obj := range objList {

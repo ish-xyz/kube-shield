@@ -26,15 +26,7 @@ func NewPolicyLoader(clientset dynamic.Interface) *PolicyLoader {
 	return policyLoader
 }
 
-func (l PolicyLoader) RegisterHandler(handler cache.ResourceEventHandler) {
-	l.Informer.AddEventHandler(handler)
-}
-
-func (l PolicyLoader) Run(stopCh <-chan struct{}) {
-	l.Informer.Run(stopCh)
-}
-
-func (l PolicyLoader) ListByNamespace(namespace string) []*unstructured.Unstructured {
+func (l *PolicyLoader) ListByNamespace(namespace string) []*unstructured.Unstructured {
 	objList := l.Informer.GetStore().List()
 	cplList := []*unstructured.Unstructured{}
 	for _, obj := range objList {

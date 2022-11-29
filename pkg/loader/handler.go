@@ -13,7 +13,7 @@ func NewPolicyHandler() *PolicyHandler {
 	return &PolicyHandler{}
 }
 
-func (p PolicyHandler) OnAdd(obj interface{}) {
+func (p *PolicyHandler) OnAdd(obj interface{}) {
 	policy, ok := obj.(*unstructured.Unstructured)
 	if !ok {
 		logrus.Warningln("Unable to parse policy")
@@ -22,7 +22,7 @@ func (p PolicyHandler) OnAdd(obj interface{}) {
 	// Add On Add Logic here. We could inject it on the constructor function and call it from here
 }
 
-func (p PolicyHandler) OnUpdate(oldObj, newObj interface{}) {
+func (p *PolicyHandler) OnUpdate(oldObj, newObj interface{}) {
 	policy, ok := newObj.(*unstructured.Unstructured)
 	if !ok {
 		logrus.Warningln("Unable to parse policy")
@@ -31,7 +31,7 @@ func (p PolicyHandler) OnUpdate(oldObj, newObj interface{}) {
 	// Add On Add Logic here. We could inject it on the constructor function and call it from here
 }
 
-func (p PolicyHandler) OnDelete(obj interface{}) {
+func (p *PolicyHandler) OnDelete(obj interface{}) {
 	policy, ok := obj.(*unstructured.Unstructured)
 	if !ok {
 		logrus.Warningln("Unable to parse policy")
