@@ -3,7 +3,9 @@ package loader
 import (
 	"time"
 
+	"github.com/sirupsen/logrus"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/dynamic/dynamicinformer"
@@ -30,4 +32,19 @@ func (l PolicyLoader) RegisterHandler(handler cache.ResourceEventHandler) {
 
 func (l PolicyLoader) Run(stopCh <-chan struct{}) {
 	l.Informer.Run(stopCh)
+}
+
+func (l PolicyLoader) ListByNamespace(namespace string) []*unstructured.Unstructured {
+	objList := l.Informer.GetStore().List()
+	cplList := []*unstructured.Unstructured{}
+	for _, obj := range objList {
+		unstr, exists := obj.(*unstructured.Unstructured)
+		if !exists {
+			logrus.Fatalln("Error converting object to unstructured")
+		}
+		if unstr.GetNamespace() == namespace {
+			cplList = append(cplList, unstr)
+		}
+	}
+	return cplList
 }
