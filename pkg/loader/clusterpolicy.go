@@ -17,7 +17,7 @@ type ClusterPolicyLoader struct {
 }
 
 func NewClusterPolicyLoader(clientset dynamic.Interface) *ClusterPolicyLoader {
-	resource := schema.GroupVersionResource{Group: "kube-shield.red-labs.co.uk", Version: "v1", Resource: "Policy"}
+	resource := schema.GroupVersionResource{Group: "kube-shield.red-labs.co.uk", Version: "v1", Resource: "ClusterPolicy"}
 	factory := dynamicinformer.NewFilteredDynamicSharedInformerFactory(clientset, time.Minute, metav1.NamespaceAll, nil)
 	informer := factory.ForResource(resource).Informer()
 	clusterPolicyLoader := &ClusterPolicyLoader{
