@@ -10,8 +10,8 @@ import (
 	"k8s.io/client-go/tools/cache"
 )
 
-func NewDynamicInformer(clientset dynamic.Interface, gvr schema.GroupVersionResource) *cache.SharedIndexInformer {
+func NewDynamicInformer(clientset dynamic.Interface, gvr schema.GroupVersionResource) cache.SharedIndexInformer {
 	factory := dynamicinformer.NewFilteredDynamicSharedInformerFactory(clientset, time.Minute, metav1.NamespaceAll, nil)
-	informer := factory.ForResource(gvr).Informer()
-	return &informer
+
+	return factory.ForResource(gvr).Informer()
 }

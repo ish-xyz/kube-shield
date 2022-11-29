@@ -43,7 +43,7 @@ func (s *Server) Run() error {
 
 	http.HandleFunc("/validate", ServeValidate)
 
-	// run tls server
+	// Run tls server
 	err := s.Http.ListenAndServeTLS("", "")
 	return err
 }
