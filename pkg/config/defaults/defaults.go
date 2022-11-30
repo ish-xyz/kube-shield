@@ -1,9 +1,9 @@
 package defaults
 
 const (
-	API_GROUP           = "kube-shield.red-labs.co.uk"
-	API_VERSION         = "v1"
-	DEFAULT_NS          = "default"
+	CR_GROUP            = "kube-shield.red-labs.co.uk"
+	CR_VERSION          = "v1"
 	POLICY_KIND         = "Policy"
 	CLUSTER_POLICY_KIND = "ClusterPolicy"
+	DEFAULT_NS          = "default"
 )
