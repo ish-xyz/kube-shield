@@ -10,7 +10,7 @@ type Kind string
 
 type RuleName string
 
-type Cache struct {
+type CacheIndex struct {
 	ClusterPolicies map[Group]map[Version]map[Kind]RuleName
 	Policies        map[Group]map[Version]map[Kind]RuleName
 }
@@ -18,4 +18,5 @@ type Cache struct {
 type CacheController struct {
 	ClusterInformer   cache.SharedIndexInformer
 	NamespaceInformer cache.SharedIndexInformer
+	CacheIndex        *CacheIndex
 }

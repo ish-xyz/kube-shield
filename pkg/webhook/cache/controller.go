@@ -8,10 +8,17 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/client-go/dynamic"
 	"k8s.io/client-go/dynamic/dynamicinformer"
-	"k8s.io/client-go/tools/cache"
+	kcache "k8s.io/client-go/tools/cache"
 )
 
-func NewCacheController(clientset dynamic.Interface) *CacheController {
+func NewEmptyCacheIndex() *CacheIndex {
+	return &CacheIndex{
+		ClusterPolicies: make(map[Group]map[Version]map[Kind]RuleName),
+		Policies:        make(map[Group]map[Version]map[Kind]RuleName),
+	}
+}
+
+func NewCacheController(clientset dynamic.Interface, c *CacheIndex) *CacheController {
 
 	clusterPolicy := schema.GroupVersionResource{
 		Group:    defaults.CR_GROUP,
@@ -30,28 +37,20 @@ func NewCacheController(clientset dynamic.Interface) *CacheController {
 	return &CacheController{
 		ClusterInformer:   factory.ForResource(clusterPolicy).Informer(),
 		NamespaceInformer: factory.ForResource(policy).Informer(),
+		CacheIndex:        c,
 	}
 }
 
-func NewEmptyCache() *Cache {
-	return &Cache{
-		ClusterPolicies: make(map[Group]map[Version]map[Kind]RuleName),
-		Policies:        make(map[Group]map[Version]map[Kind]RuleName),
-	}
+func (c *CacheController) RegisterHandlers() {
+	c.ClusterInformer.AddEventHandler(kcache.ResourceEventHandlerFuncs{
+		AddFunc:    c.onAdd,
+		DeleteFunc: c.onDelete,
+	})
+
+	c.NamespaceInformer.AddEventHandler(kcache.ResourceEventHandlerFuncs{
+		AddFunc:    c.onAdd,
+		DeleteFunc: c.onDelete,
+	})
 }
 
-func NewDynamicInformer(clientset dynamic.Interface, grp, ver, res string) cache.SharedIndexInformer {
-
-	gvr := schema.GroupVersionResource{
-		Group:    grp,
-		Version:  ver,
-		Resource: res,
-	}
-	factory := dynamicinformer.NewFilteredDynamicSharedInformerFactory(clientset, time.Minute, metav1.NamespaceAll, nil)
-
-	return factory.ForResource(gvr).Informer()
-}
-
-// OnAdd()  -> add name to Cache
-// OnDelete() -> remove from Cache
 // Reconcile() -> reconciles cache with resources in the cluster (using informers)
