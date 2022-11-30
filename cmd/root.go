@@ -5,10 +5,13 @@ import (
 	"os"
 
 	"github.com/RedLabsPlatform/kube-shield/pkg/config"
-	"github.com/RedLabsPlatform/kube-shield/pkg/webhook/server"
+	"github.com/RedLabsPlatform/kube-shield/pkg/webhook/cache"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"k8s.io/client-go/dynamic"
+	"k8s.io/client-go/rest"
+	"k8s.io/client-go/tools/clientcmd"
 )
 
 var (
@@ -32,6 +35,7 @@ func init() {
 	Cmd.Flags().StringVarP(&configFile, "config", "c", "", "Kube-shield configuration file")
 
 	// Bound Flags
+	Cmd.Flags().StringP("kubeconfig", "k", "", "Path to the kubeconfig file to run outside of the cluster")
 	Cmd.Flags().StringP("policies", "p", "", "Path to the directory with the policies")
 	Cmd.Flags().String("web-address", "0.0.0.0:8000", "Address where the webhook webserver is exposed")
 	Cmd.Flags().String("web-path", "/webhook", "Path where the webhook webserver is reachable")
@@ -50,6 +54,7 @@ func init() {
 	viper.BindPFlag("web.tls.key", Cmd.Flags().Lookup("tls-key"))
 	viper.BindPFlag("web.tls.cert", Cmd.Flags().Lookup("tls-cert"))
 
+	viper.BindPFlag("kubeconfig", Cmd.Flags().Lookup("kubeconfig"))
 	viper.BindPFlag("policies", Cmd.Flags().Lookup("policies"))
 	viper.BindPFlag("register", Cmd.Flags().Lookup("register-webhook"))
 	viper.BindPFlag("debug", Cmd.Flags().Lookup("debug"))
@@ -90,10 +95,16 @@ func start(cmd *cobra.Command, args []string) {
 		logrus.Fatalf("config validation failed: %v", err)
 	}
 
-	srv, err := server.NewServer(cfg)
-	if err != nil {
-		logrus.Fatalf("cannot create new server instance: %v", err)
+	kubecfg, err := rest.InClusterConfig()
+	if viper.GetString("kubeconfig") != "" {
+		kubecfg, err = clientcmd.BuildConfigFromFlags("", viper.GetString("kubeconfig"))
 	}
-	srv.Run()
+
+	dc, err := dynamic.NewForConfig(kubecfg)
+
+	index := cache.NewEmptyCacheIndex()
+	cachectrl := cache.NewCacheController(dc, index)
+
+	_ = cachectrl
 
 }

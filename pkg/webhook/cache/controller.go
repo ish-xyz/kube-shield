@@ -54,3 +54,6 @@ func (c *CacheController) RegisterHandlers() {
 }
 
 // Reconcile() -> reconciles cache with resources in the cluster (using informers)
+/*
+	should list every cluster policy and every policy in each namespace and add it to the index
+*/
