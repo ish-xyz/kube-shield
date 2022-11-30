@@ -12,3 +12,11 @@
 
 ## Dynamic loading?
 - Have a goroutine that watches the CRDs and dynamically loads the new rules
+
+## Metrics
+- expose metrics related to admission review for reporting purposes
+
+## Report generation
+- report generation. separate controller to verify how many existing object are not following policies
+- this could/should be a separate binary
+
