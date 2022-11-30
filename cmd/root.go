@@ -36,7 +36,6 @@ func init() {
 
 	// Bound Flags
 	Cmd.Flags().StringP("kubeconfig", "k", "", "Path to the kubeconfig file to run outside of the cluster")
-	Cmd.Flags().StringP("policies", "p", "", "Path to the directory with the policies")
 	Cmd.Flags().String("web-address", "0.0.0.0:8000", "Address where the webhook webserver is exposed")
 	Cmd.Flags().String("web-path", "/webhook", "Path where the webhook webserver is reachable")
 	Cmd.Flags().String("tls-key", "/etc/kube-shield/tls/key.pem", "Path to the tls private key")
@@ -46,14 +45,10 @@ func init() {
 	Cmd.Flags().BoolP("register-webhook", "r", true, "create ValidatingWebhookConfiguration resource in the current Kubernetes")
 	Cmd.Flags().BoolP("debug", "d", false, "debug mode")
 
-	// Required flags
-	Cmd.MarkFlagRequired("policies")
-
 	viper.BindPFlag("web.address", Cmd.Flags().Lookup("web-address"))
 	viper.BindPFlag("web.path", Cmd.Flags().Lookup("web-path"))
 	viper.BindPFlag("web.tls.key", Cmd.Flags().Lookup("tls-key"))
 	viper.BindPFlag("web.tls.cert", Cmd.Flags().Lookup("tls-cert"))
-
 	viper.BindPFlag("kubeconfig", Cmd.Flags().Lookup("kubeconfig"))
 	viper.BindPFlag("policies", Cmd.Flags().Lookup("policies"))
 	viper.BindPFlag("register", Cmd.Flags().Lookup("register-webhook"))
@@ -79,7 +74,6 @@ func start(cmd *cobra.Command, args []string) {
 	}
 
 	cfg := config.NewConfig(
-		viper.GetString("policies"),
 		viper.GetString("web.address"),
 		viper.GetString("web.path"),
 		viper.GetString("web.tls.key"),
@@ -98,6 +92,10 @@ func start(cmd *cobra.Command, args []string) {
 	kubecfg, err := rest.InClusterConfig()
 	if viper.GetString("kubeconfig") != "" {
 		kubecfg, err = clientcmd.BuildConfigFromFlags("", viper.GetString("kubeconfig"))
+	}
+
+	if err != nil {
+		logrus.Fatal("controller is not running in-cluster and the kubeconfig flag has not been passed")
 	}
 
 	dc, err := dynamic.NewForConfig(kubecfg)
