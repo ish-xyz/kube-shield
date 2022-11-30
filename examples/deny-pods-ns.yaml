@@ -1,6 +1,6 @@
 # Allowed operators: Equal, NotEqual, Regex, GreaterThan, LowerThan
 apiVersion: kube-shield.red-labs.co.uk/v1
-kind: Policy #or Policy
+kind: Policy #or ClusterPolicy
 metadata:
   name: some-random-policy
 spec:

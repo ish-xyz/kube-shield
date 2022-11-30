@@ -23,7 +23,7 @@ func NewCacheController(clientset dynamic.Interface, c *CacheIndex) *CacheContro
 	clusterPolicy := schema.GroupVersionResource{
 		Group:    defaults.CR_GROUP,
 		Version:  defaults.CR_VERSION,
-		Resource: defaults.CLUSTER_POLICY_KIND,
+		Resource: defaults.POLICY_KIND,
 	}
 
 	policy := schema.GroupVersionResource{
@@ -54,7 +54,7 @@ func (c *CacheController) Run(stopCh <-chan struct{}) {
 		DeleteFunc: c.onDelete,
 	})
 
-	go c.ClusterInformer.Run(stopCh)
+	//go c.ClusterInformer.Run(stopCh)
 	go c.NamespaceInformer.Run(stopCh)
 
 	<-stopCh

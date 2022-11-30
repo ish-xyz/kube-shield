@@ -1,11 +1,13 @@
 package cache
 
-import "fmt"
+import (
+	"github.com/sirupsen/logrus"
+)
 
 func (c *CacheController) onAdd(obj interface{}) {
-	fmt.Println(obj)
+	logrus.Warnln("onAdd")
 }
 
 func (c *CacheController) onDelete(obj interface{}) {
-	fmt.Println(obj)
+	logrus.Warnln("onDelete")
 }
