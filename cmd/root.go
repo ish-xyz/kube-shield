@@ -104,7 +104,5 @@ func start(cmd *cobra.Command, args []string) {
 
 	index := cache.NewEmptyCacheIndex()
 	cachectrl := cache.NewCacheController(dc, index)
-
-	_ = cachectrl
-
+	cachectrl.Run(make(chan struct{}))
 }

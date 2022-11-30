@@ -41,7 +41,9 @@ func NewCacheController(clientset dynamic.Interface, c *CacheIndex) *CacheContro
 	}
 }
 
-func (c *CacheController) RegisterHandlers() {
+func (c *CacheController) Run(stopCh <-chan struct{}) {
+
+	// Register handlers
 	c.ClusterInformer.AddEventHandler(kcache.ResourceEventHandlerFuncs{
 		AddFunc:    c.onAdd,
 		DeleteFunc: c.onDelete,
@@ -51,6 +53,11 @@ func (c *CacheController) RegisterHandlers() {
 		AddFunc:    c.onAdd,
 		DeleteFunc: c.onDelete,
 	})
+
+	go c.ClusterInformer.Run(stopCh)
+	go c.NamespaceInformer.Run(stopCh)
+
+	<-stopCh
 }
 
 // Reconcile() -> reconciles cache with resources in the cluster (using informers)
