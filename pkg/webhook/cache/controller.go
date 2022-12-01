@@ -13,9 +13,10 @@ import (
 )
 
 func NewEmptyCacheIndex() *CacheIndex {
+
 	return &CacheIndex{
-		ClusterPolicies: make(map[Group]map[Version]map[Kind]RuleName),
-		Policies:        make(map[Group]map[Version]map[Kind]RuleName),
+		ClusterPolicies: make(map[Group]map[Version]map[Kind][]RuleName),
+		Policies:        make(map[Namespace]map[Group]map[Version]map[Kind][]RuleName),
 	}
 }
 
@@ -46,13 +47,13 @@ func (c *CacheController) Run(stopCh <-chan struct{}) {
 
 	// Register handlers
 	c.ClusterInformer.AddEventHandler(kcache.ResourceEventHandlerFuncs{
-		AddFunc:    c.onAdd,
-		DeleteFunc: c.onDelete,
+		AddFunc:    c.onClusterPolicyAdd,
+		DeleteFunc: c.onClusterPolicyDelete,
 	})
 
 	c.NamespaceInformer.AddEventHandler(kcache.ResourceEventHandlerFuncs{
-		AddFunc:    c.onAdd,
-		DeleteFunc: c.onDelete,
+		AddFunc:    c.onPolicyAdd,
+		DeleteFunc: c.onPolicyDelete,
 	})
 
 	//go c.ClusterInformer.Run(stopCh)
