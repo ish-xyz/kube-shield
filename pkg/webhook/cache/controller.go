@@ -1,6 +1,7 @@
 package cache
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/RedLabsPlatform/kube-shield/pkg/config/defaults"
@@ -23,13 +24,13 @@ func NewCacheController(clientset dynamic.Interface, c *CacheIndex) *CacheContro
 	clusterPolicy := schema.GroupVersionResource{
 		Group:    defaults.CR_GROUP,
 		Version:  defaults.CR_VERSION,
-		Resource: defaults.POLICY_KIND,
+		Resource: defaults.CLUSTER_POLICY_KIND,
 	}
 
 	policy := schema.GroupVersionResource{
 		Group:    defaults.CR_GROUP,
 		Version:  defaults.CR_VERSION,
-		Resource: defaults.CLUSTER_POLICY_KIND,
+		Resource: defaults.POLICY_KIND,
 	}
 
 	factory := dynamicinformer.NewFilteredDynamicSharedInformerFactory(clientset, time.Minute, metav1.NamespaceAll, nil)
@@ -55,6 +56,7 @@ func (c *CacheController) Run(stopCh <-chan struct{}) {
 	})
 
 	//go c.ClusterInformer.Run(stopCh)
+	fmt.Println("starting informer")
 	go c.NamespaceInformer.Run(stopCh)
 
 	<-stopCh
