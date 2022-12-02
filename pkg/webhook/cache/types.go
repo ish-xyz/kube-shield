@@ -18,8 +18,7 @@ type RuleName string
 
 type CacheIndex struct {
 	sync.Mutex
-	ClusterPolicies map[Group]map[Version]map[Kind][]RuleName
-	Policies        map[Namespace]map[Group]map[Version]map[Kind][]RuleName
+	Policies map[Namespace]map[Group]map[Version]map[Kind][]RuleName
 }
 
 type CacheController struct {

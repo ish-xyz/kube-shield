@@ -1,7 +1,6 @@
 package cache
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/RedLabsPlatform/kube-shield/pkg/config/defaults"
@@ -15,8 +14,7 @@ import (
 func NewEmptyCacheIndex() *CacheIndex {
 
 	return &CacheIndex{
-		ClusterPolicies: make(map[Group]map[Version]map[Kind][]RuleName),
-		Policies:        make(map[Namespace]map[Group]map[Version]map[Kind][]RuleName),
+		Policies: make(map[Namespace]map[Group]map[Version]map[Kind][]RuleName),
 	}
 }
 
@@ -43,7 +41,7 @@ func NewCacheController(clientset dynamic.Interface, c *CacheIndex) *CacheContro
 	}
 }
 
-func (c *CacheController) Run(stopCh <-chan struct{}) {
+func (c *CacheController) Run(ch <-chan struct{}) {
 
 	// Register handlers
 	c.ClusterInformer.AddEventHandler(kcache.ResourceEventHandlerFuncs{
@@ -56,11 +54,10 @@ func (c *CacheController) Run(stopCh <-chan struct{}) {
 		DeleteFunc: c.onPolicyDelete,
 	})
 
-	//go c.ClusterInformer.Run(stopCh)
-	fmt.Println("starting informer")
-	go c.NamespaceInformer.Run(stopCh)
+	//go c.ClusterInformer.Run(ch)
+	go c.NamespaceInformer.Run(ch)
 
-	<-stopCh
+	<-ch
 }
 
 // Reconcile() -> reconciles cache with resources in the cluster (using informers)

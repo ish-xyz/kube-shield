@@ -23,6 +23,24 @@ type PolicySpec struct {
 	} `json:"policies"`
 }
 
+type ClusterPolicy struct {
+	metav1.TypeMeta   `json:",inline"`
+	metav1.ObjectMeta `json:"metadata,omitempty"`
+	Spec              ClusterPolicySpec `json:"spec,omitempty"`
+}
+
+type ClusterPolicySpec struct {
+	DefaultBehaviour string `json:"defaultBehaviour"`
+	ApplyOn          []struct {
+		APIVersion string `json:"apiVersion"`
+		Kind       string `json:"kind"`
+	} `json:"applyOn"`
+	Policies []struct {
+		Name  string  `json:"name"`
+		Rules []*Rule `json:"rules"`
+	} `json:"policies"`
+}
+
 type Rule struct {
 	Field    string `json:"field"`
 	Operator string `json:"operator"`
