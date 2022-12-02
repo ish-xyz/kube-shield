@@ -1,6 +1,10 @@
 package cache
 
-import "k8s.io/client-go/tools/cache"
+import (
+	"sync"
+
+	"k8s.io/client-go/tools/cache"
+)
 
 type Namespace string
 
@@ -13,6 +17,7 @@ type Kind string
 type RuleName string
 
 type CacheIndex struct {
+	sync.Mutex
 	ClusterPolicies map[Group]map[Version]map[Kind][]RuleName
 	Policies        map[Namespace]map[Group]map[Version]map[Kind][]RuleName
 }

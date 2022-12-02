@@ -5,10 +5,8 @@ metadata:
   name: some-random-policy
 spec:
   applyOn:
-    apiVersions:
-    - v1
-    kinds:
-    - Pod
+    - apiVersion: v1
+      kind: Pod
   defaultBehaviour: IfMatchDeny
   policies:
   - name: rule-name

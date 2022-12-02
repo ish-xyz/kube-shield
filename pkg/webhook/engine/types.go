@@ -13,9 +13,9 @@ type Policy struct {
 
 type PolicySpec struct {
 	DefaultBehaviour string `json:"defaultBehaviour"`
-	ApplyOn          struct {
-		ApiVersions []string `json:"apiVersions"`
-		Kinds       []string `json:"kinds"`
+	ApplyOn          []struct {
+		APIVersion string `json:"apiVersion"`
+		Kind       string `json:"kind"`
 	} `json:"applyOn"`
 	Policies []struct {
 		Name  string  `json:"name"`

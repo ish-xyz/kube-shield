@@ -19,19 +19,17 @@ spec:
                   type: string
                   pattern: '^(IfMatchDeny|IfMatchAllow)$'
                 applyOn:
-                  type: object
-                  properties:
-                    apiVersions:
-                      type: array
-                      items:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      apiVersion:
                         type: string
-                    kinds:
-                      type: array
-                      items:
+                      kind:
                         type: string
-                  required:
-                  - apiVersions
-                  - kinds
+                    required:
+                    - apiVersion
+                    - kind
                 policies:
                   type: array
                   items:

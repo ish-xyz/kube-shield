@@ -2,6 +2,7 @@ package cache
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/RedLabsPlatform/kube-shield/pkg/webhook/engine"
 	"github.com/sirupsen/logrus"
@@ -15,15 +16,34 @@ func (c *CacheController) onPolicyAdd(obj interface{}) {
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(obj.(*unstructured.Unstructured).Object, &policy)
 	if err != nil {
 		logrus.Errorln("failed to unmarshal unstructured object into Policy")
+		return
 	}
 
-	// hard coded for testing
-	c.CacheIndex.AddPolicyFromAddress("default//v1/deployment/rule1")
-	c.CacheIndex.AddPolicyFromAddress("default//v1/deployment/rule2")
-	c.CacheIndex.AddPolicyFromAddress("default/apps/v1/deployment/rule2")
+	for _, res := range policy.Spec.ApplyOn {
+		c.CacheIndex.Lock()
+
+		// Core resources don't have a group specified
+		// So we set the group to "nil"
+		// "_" is there because it's not possible to have groups that starts with _
+		gvr := strings.Split(res.APIVersion, "/")
+		group := "_nil"
+		version := res.APIVersion
+		if len(gvr) > 1 {
+			group = gvr[0]
+			version = gvr[1]
+		}
+
+		c.CacheIndex.CachePolicyResourcesMapping(
+			Namespace(policy.Namespace),
+			Group(group),
+			Version(version),
+			Kind(res.Kind),
+			RuleName(policy.Name),
+		)
+		c.CacheIndex.Unlock()
+	}
 
 	fmt.Println(c.CacheIndex)
-
 	fmt.Println(policy)
 }
 
