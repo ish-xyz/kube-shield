@@ -1,6 +1,7 @@
 package cache
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/RedLabsPlatform/kube-shield/pkg/config/defaults"
@@ -57,7 +58,12 @@ func (c *CacheController) Run(ch <-chan struct{}) {
 	//go c.ClusterInformer.Run(ch)
 	go c.NamespaceInformer.Run(ch)
 
-	<-ch
+	for {
+		fmt.Println(c.CacheIndex)
+		time.Sleep(2 * time.Second)
+	}
+
+	// <-ch
 }
 
 // Reconcile() -> reconciles cache with resources in the cluster (using informers)

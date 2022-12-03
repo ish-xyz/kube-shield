@@ -1,7 +1,6 @@
 package cache
 
 import (
-	"fmt"
 	"strings"
 
 	"github.com/RedLabsPlatform/kube-shield/pkg/webhook/engine"
@@ -10,24 +9,58 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 )
 
-const (
-	DELETE = 0
-	ADD    = 1
-)
+func getGV(info string) (Group, Version) {
+
+	gv := strings.Split(info, "/")
+	group := "_core"
+	version := info
+	if len(gv) > 1 {
+		group = gv[0]
+		version = gv[1]
+	}
+
+	return Group(group), Version(version)
+}
+
+func (c *CacheController) onPolicyUpdate(oldObj interface{}, newObj interface{}) {
+
+	var oldPolicy *engine.Policy
+	var newPolicy *engine.Policy
+
+	errOldPol := runtime.DefaultUnstructuredConverter.FromUnstructured(oldObj.(*unstructured.Unstructured).Object, &oldPolicy)
+	errNewPol := runtime.DefaultUnstructuredConverter.FromUnstructured(newObj.(*unstructured.Unstructured).Object, &newPolicy)
+	if errOldPol != nil || errNewPol != nil {
+		logrus.Fatal("failed to unmarshal unstructured object into Policy %v %v", errOldPol, errNewPol)
+		return
+	}
+
+	// lock index, remove old policies and add new ones
+	c.CacheIndex.Lock()
+	for _, res := range oldPolicy.Spec.ApplyOn {
+		group, version := getGV(res.APIVersion)
+		c.CacheIndex.Delete(Namespace(oldPolicy.Namespace), group, version, Kind(res.Kind), PolicyName(oldPolicy.Name))
+	}
+	for _, res := range newPolicy.Spec.ApplyOn {
+		group, version := getGV(res.APIVersion)
+		c.CacheIndex.Add(Namespace(newPolicy.Namespace), group, version, Kind(res.Kind), PolicyName(newPolicy.Name))
+	}
+	c.CacheIndex.Unlock()
+}
 
 func (c *CacheController) onPolicyAdd(obj interface{}) {
 
 	var policy *engine.Policy
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(obj.(*unstructured.Unstructured).Object, &policy)
 	if err != nil {
-		logrus.Errorln("failed to unmarshal unstructured object into Policy")
+		logrus.Fatal("failed to unmarshal unstructured object into Policy")
 		return
 	}
 
-	err = c.handleIndexRequest(policy.Spec.ApplyOn, ADD, policy.Namespace, policy.Name)
-	if err != nil {
-		logrus.Errorln("failed to ADD policy to memory index")
-		return
+	for _, res := range policy.Spec.ApplyOn {
+		group, version := getGV(res.APIVersion)
+		c.CacheIndex.Lock()
+		c.CacheIndex.Add(Namespace(policy.Namespace), group, version, Kind(res.Kind), PolicyName(policy.Name))
+		c.CacheIndex.Unlock()
 	}
 }
 
@@ -35,14 +68,15 @@ func (c *CacheController) onPolicyDelete(obj interface{}) {
 	var policy *engine.Policy
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(obj.(*unstructured.Unstructured).Object, &policy)
 	if err != nil {
-		logrus.Errorln("failed to unmarshal unstructured object into Policy")
+		logrus.Fatal("failed to unmarshal unstructured object into Policy")
 		return
 	}
 
-	err = c.handleIndexRequest(policy.Spec.ApplyOn, DELETE, policy.Namespace, policy.Name)
-	if err != nil {
-		logrus.Errorln("failed to DELETE policy to memory index")
-		return
+	for _, res := range policy.Spec.ApplyOn {
+		group, version := getGV(res.APIVersion)
+		c.CacheIndex.Lock()
+		c.CacheIndex.Delete(Namespace(policy.Namespace), group, version, Kind(res.Kind), PolicyName(policy.Name))
+		c.CacheIndex.Unlock()
 	}
 }
 
@@ -50,14 +84,15 @@ func (c *CacheController) onClusterPolicyAdd(obj interface{}) {
 	var clusterpolicy *engine.ClusterPolicy
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(obj.(*unstructured.Unstructured).Object, &clusterpolicy)
 	if err != nil {
-		logrus.Errorln("failed to unmarshal unstructured object into Policy")
+		logrus.Fatal("failed to unmarshal unstructured object into Policy")
 		return
 	}
 
-	err = c.handleIndexRequest(clusterpolicy.Spec.ApplyOn, ADD, "_ClusterScope", clusterpolicy.Name)
-	if err != nil {
-		logrus.Errorln("failed to ADD policy to memory index")
-		return
+	for _, res := range clusterpolicy.Spec.ApplyOn {
+		group, version := getGV(res.APIVersion)
+		c.CacheIndex.Lock()
+		c.CacheIndex.Add(Namespace("_ClusterScope"), group, version, Kind(res.Kind), PolicyName(clusterpolicy.Name))
+		c.CacheIndex.Unlock()
 	}
 }
 
@@ -70,48 +105,10 @@ func (c *CacheController) onClusterPolicyDelete(obj interface{}) {
 		return
 	}
 
-	err = c.handleIndexRequest(clusterpolicy.Spec.ApplyOn, DELETE, "_ClusterScope", clusterpolicy.Name)
-	if err != nil {
-		logrus.Errorln("failed to DELETE policy to memory index")
-		return
-	}
-}
-
-func (c *CacheController) handleIndexRequest(resources []*engine.ResourceAddress, ops int, namespace string, policyName string) error {
-
-	var fn func(ns Namespace, grp Group, ver Version, kind Kind, name PolicyName)
-
-	if ops == ADD {
-		fn = c.CacheIndex.Add
-	} else if ops == DELETE {
-		fn = c.CacheIndex.Delete
-	} else {
-		return fmt.Errorf("index handler invalid operations")
-	}
-
-	for _, res := range resources {
-
-		// Core resources don't have a group specified
-		// So we set the group to "_core"
-		// "_" is there because it's not possible to have groups that starts with _ in the k8s CRDs,
-		// so it won't overwrite any possible CRD
-		gvr := strings.Split(res.APIVersion, "/")
-		group := "_core"
-		version := res.APIVersion
-		if len(gvr) > 1 {
-			group = gvr[0]
-			version = gvr[1]
-		}
-
+	for _, res := range clusterpolicy.Spec.ApplyOn {
+		group, version := getGV(res.APIVersion)
 		c.CacheIndex.Lock()
-		fn(
-			Namespace(namespace),
-			Group(group),
-			Version(version),
-			Kind(res.Kind),
-			PolicyName(policyName),
-		)
+		c.CacheIndex.Delete(Namespace("_ClusterScope"), group, version, Kind(res.Kind), PolicyName(clusterpolicy.Name))
 		c.CacheIndex.Unlock()
 	}
-	return nil
 }
