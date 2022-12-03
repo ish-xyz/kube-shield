@@ -2,7 +2,6 @@ package cache
 
 // Add resource address into Cache Index
 // Resource address example: NS/GROUP/VERSION/KIND/RULENAME
-// TODO: This code is ugly, I'll clean it
 func (c *CacheIndex) Add(ns Namespace, grp Group, ver Version, kind Kind, name PolicyName) {
 
 	if _, ok := c.Policies[ns]; !ok {
