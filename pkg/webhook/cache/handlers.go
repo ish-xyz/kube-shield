@@ -80,11 +80,36 @@ func (c *CacheController) onPolicyDelete(obj interface{}) {
 	}
 }
 
+func (c *CacheController) onClusterPolicyUpdate(oldObj interface{}, newObj interface{}) {
+
+	var oldPolicy *engine.ClusterPolicy
+	var newPolicy *engine.ClusterPolicy
+
+	errOldPol := runtime.DefaultUnstructuredConverter.FromUnstructured(oldObj.(*unstructured.Unstructured).Object, &oldPolicy)
+	errNewPol := runtime.DefaultUnstructuredConverter.FromUnstructured(newObj.(*unstructured.Unstructured).Object, &newPolicy)
+	if errOldPol != nil || errNewPol != nil {
+		logrus.Fatal("failed to unmarshal unstructured object into ClusterPolicy %v %v", errOldPol, errNewPol)
+		return
+	}
+
+	// lock index, remove old policies and add new ones
+	c.CacheIndex.Lock()
+	for _, res := range oldPolicy.Spec.ApplyOn {
+		group, version := getGV(res.APIVersion)
+		c.CacheIndex.Delete(Namespace("_ClusterScope"), group, version, Kind(res.Kind), PolicyName(oldPolicy.Name))
+	}
+	for _, res := range newPolicy.Spec.ApplyOn {
+		group, version := getGV(res.APIVersion)
+		c.CacheIndex.Add(Namespace("_ClusterScope"), group, version, Kind(res.Kind), PolicyName(newPolicy.Name))
+	}
+	c.CacheIndex.Unlock()
+}
+
 func (c *CacheController) onClusterPolicyAdd(obj interface{}) {
 	var clusterpolicy *engine.ClusterPolicy
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(obj.(*unstructured.Unstructured).Object, &clusterpolicy)
 	if err != nil {
-		logrus.Fatal("failed to unmarshal unstructured object into Policy")
+		logrus.Fatal("failed to unmarshal unstructured object into ClusterPolicy")
 		return
 	}
 
@@ -101,7 +126,7 @@ func (c *CacheController) onClusterPolicyDelete(obj interface{}) {
 	var clusterpolicy *engine.ClusterPolicy
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(obj.(*unstructured.Unstructured).Object, &clusterpolicy)
 	if err != nil {
-		logrus.Errorln("failed to unmarshal unstructured object into Policy")
+		logrus.Errorln("failed to unmarshal unstructured object into ClusterPolicy")
 		return
 	}
 

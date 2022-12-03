@@ -47,11 +47,13 @@ func (c *CacheController) Run(ch <-chan struct{}) {
 	// Register handlers
 	c.ClusterInformer.AddEventHandler(kcache.ResourceEventHandlerFuncs{
 		AddFunc:    c.onClusterPolicyAdd,
+		UpdateFunc: c.onClusterPolicyUpdate,
 		DeleteFunc: c.onClusterPolicyDelete,
 	})
 
 	c.NamespaceInformer.AddEventHandler(kcache.ResourceEventHandlerFuncs{
 		AddFunc:    c.onPolicyAdd,
+		UpdateFunc: c.onPolicyUpdate,
 		DeleteFunc: c.onPolicyDelete,
 	})
 
