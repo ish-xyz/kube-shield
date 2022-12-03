@@ -24,7 +24,7 @@ func (c *CacheIndex) Add(ns Namespace, grp Group, ver Version, kind Kind, name P
 	}
 }
 
-func (c *CacheIndex) Remove(ns Namespace, grp Group, ver Version, kind Kind, name PolicyName) {
+func (c *CacheIndex) Delete(ns Namespace, grp Group, ver Version, kind Kind, name PolicyName) {
 	if _, exists := c.Policies[ns][grp][ver][kind]; exists {
 		var newPoliciesArr []PolicyName
 		for _, cachedPolicyName := range c.Policies[ns][grp][ver][kind] {

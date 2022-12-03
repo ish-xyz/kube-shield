@@ -10,7 +10,10 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 )
 
-//TODO: too much code repetition here, clean up.
+const (
+	DELETE = 0
+	ADD    = 1
+)
 
 func (c *CacheController) onPolicyAdd(obj interface{}) {
 
@@ -21,31 +24,11 @@ func (c *CacheController) onPolicyAdd(obj interface{}) {
 		return
 	}
 
-	for _, res := range policy.Spec.ApplyOn {
-
-		// Core resources don't have a group specified
-		// So we set the group to "_core"
-		// "_" is there because it's not possible to have groups that starts with _ in the k8s CRDs,
-		// so it won't overwrite any possible CRD
-		gvr := strings.Split(res.APIVersion, "/")
-		group := "_core"
-		version := res.APIVersion
-		if len(gvr) > 1 {
-			group = gvr[0]
-			version = gvr[1]
-		}
-
-		c.CacheIndex.Lock()
-		c.CacheIndex.Add(
-			Namespace(policy.Namespace),
-			Group(group),
-			Version(version),
-			Kind(res.Kind),
-			PolicyName(policy.Name),
-		)
-		c.CacheIndex.Unlock()
+	err = c.handleIndexRequest(policy.Spec.ApplyOn, ADD, policy.Namespace, policy.Name)
+	if err != nil {
+		logrus.Errorln("failed to ADD policy to memory index")
+		return
 	}
-	fmt.Println(c.CacheIndex.Policies)
 }
 
 func (c *CacheController) onPolicyDelete(obj interface{}) {
@@ -56,31 +39,11 @@ func (c *CacheController) onPolicyDelete(obj interface{}) {
 		return
 	}
 
-	for _, res := range policy.Spec.ApplyOn {
-
-		// Core resources don't have a group specified
-		// So we set the group to "_core"
-		// "_" is there because it's not possible to have groups that starts with _ in the k8s CRDs,
-		// so it won't overwrite any possible CRD
-		gvr := strings.Split(res.APIVersion, "/")
-		group := "_core"
-		version := res.APIVersion
-		if len(gvr) > 1 {
-			group = gvr[0]
-			version = gvr[1]
-		}
-
-		c.CacheIndex.Lock()
-		c.CacheIndex.Remove(
-			Namespace(policy.Namespace),
-			Group(group),
-			Version(version),
-			Kind(res.Kind),
-			PolicyName(policy.Name),
-		)
-		c.CacheIndex.Unlock()
+	err = c.handleIndexRequest(policy.Spec.ApplyOn, DELETE, policy.Namespace, policy.Name)
+	if err != nil {
+		logrus.Errorln("failed to DELETE policy to memory index")
+		return
 	}
-	fmt.Println(c.CacheIndex.Policies)
 }
 
 func (c *CacheController) onClusterPolicyAdd(obj interface{}) {
@@ -91,31 +54,11 @@ func (c *CacheController) onClusterPolicyAdd(obj interface{}) {
 		return
 	}
 
-	for _, res := range clusterpolicy.Spec.ApplyOn {
-
-		// Core resources don't have a group specified
-		// So we set the group to "_core"
-		// "_" is there because it's not possible to have groups that starts with _ in the k8s CRDs,
-		// so it won't overwrite any possible CRD
-		gvr := strings.Split(res.APIVersion, "/")
-		group := "_core"
-		version := res.APIVersion
-		if len(gvr) > 1 {
-			group = gvr[0]
-			version = gvr[1]
-		}
-
-		c.CacheIndex.Lock()
-		c.CacheIndex.Add(
-			Namespace("_ClusterScope"),
-			Group(group),
-			Version(version),
-			Kind(res.Kind),
-			PolicyName(clusterpolicy.Name),
-		)
-		c.CacheIndex.Unlock()
+	err = c.handleIndexRequest(clusterpolicy.Spec.ApplyOn, ADD, "_ClusterScope", clusterpolicy.Name)
+	if err != nil {
+		logrus.Errorln("failed to ADD policy to memory index")
+		return
 	}
-	fmt.Println(c.CacheIndex.Policies)
 }
 
 func (c *CacheController) onClusterPolicyDelete(obj interface{}) {
@@ -127,7 +70,26 @@ func (c *CacheController) onClusterPolicyDelete(obj interface{}) {
 		return
 	}
 
-	for _, res := range clusterpolicy.Spec.ApplyOn {
+	err = c.handleIndexRequest(clusterpolicy.Spec.ApplyOn, DELETE, "_ClusterScope", clusterpolicy.Name)
+	if err != nil {
+		logrus.Errorln("failed to DELETE policy to memory index")
+		return
+	}
+}
+
+func (c *CacheController) handleIndexRequest(resources []*engine.ResourceAddress, ops int, namespace string, policyName string) error {
+
+	var fn func(ns Namespace, grp Group, ver Version, kind Kind, name PolicyName)
+
+	if ops == ADD {
+		fn = c.CacheIndex.Add
+	} else if ops == DELETE {
+		fn = c.CacheIndex.Delete
+	} else {
+		return fmt.Errorf("index handler invalid operations")
+	}
+
+	for _, res := range resources {
 
 		// Core resources don't have a group specified
 		// So we set the group to "_core"
@@ -142,14 +104,14 @@ func (c *CacheController) onClusterPolicyDelete(obj interface{}) {
 		}
 
 		c.CacheIndex.Lock()
-		c.CacheIndex.Remove(
-			Namespace("_ClusterScope"),
+		fn(
+			Namespace(namespace),
 			Group(group),
 			Version(version),
 			Kind(res.Kind),
-			PolicyName(clusterpolicy.Name),
+			PolicyName(policyName),
 		)
 		c.CacheIndex.Unlock()
 	}
-	fmt.Println(c.CacheIndex.Policies)
+	return nil
 }
