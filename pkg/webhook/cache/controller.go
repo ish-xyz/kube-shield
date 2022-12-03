@@ -14,7 +14,7 @@ import (
 func NewEmptyCacheIndex() *CacheIndex {
 
 	return &CacheIndex{
-		Policies: make(map[Namespace]map[Group]map[Version]map[Kind][]RuleName),
+		Policies: make(map[Namespace]map[Group]map[Version]map[Kind][]PolicyName),
 	}
 }
 
