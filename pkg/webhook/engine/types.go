@@ -1,7 +1,7 @@
 package engine
 
 import (
-	"github.come/RedLabsPlatform/kube-shield/pkg/webhook/cache"
+	"github.com/RedLabsPlatform/kube-shield/pkg/webhook/cache"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
