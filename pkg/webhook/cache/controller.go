@@ -1,10 +1,10 @@
 package cache
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/RedLabsPlatform/kube-shield/pkg/config/defaults"
+	"github.com/sirupsen/logrus"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/client-go/dynamic"
@@ -19,7 +19,7 @@ func NewEmptyCacheIndex() *CacheIndex {
 	}
 }
 
-func NewCacheController(clientset dynamic.Interface, c *CacheIndex) *CacheController {
+func NewCacheController(clientset dynamic.Interface, c *CacheIndex) *Controller {
 
 	clusterPolicy := schema.GroupVersionResource{
 		Group:    defaults.CR_GROUP,
@@ -35,14 +35,14 @@ func NewCacheController(clientset dynamic.Interface, c *CacheIndex) *CacheContro
 
 	factory := dynamicinformer.NewFilteredDynamicSharedInformerFactory(clientset, time.Minute, metav1.NamespaceAll, nil)
 
-	return &CacheController{
+	return &Controller{
 		ClusterInformer:   factory.ForResource(clusterPolicy).Informer(),
 		NamespaceInformer: factory.ForResource(policy).Informer(),
 		CacheIndex:        c,
 	}
 }
 
-func (c *CacheController) Run(ch <-chan struct{}) {
+func (c *Controller) Run(polStopCh <-chan struct{}, clusterPolStopCh <-chan struct{}) {
 
 	// Register handlers
 	c.ClusterInformer.AddEventHandler(kcache.ResourceEventHandlerFuncs{
@@ -57,15 +57,17 @@ func (c *CacheController) Run(ch <-chan struct{}) {
 		DeleteFunc: c.onPolicyDelete,
 	})
 
-	//go c.ClusterInformer.Run(ch)
-	go c.NamespaceInformer.Run(ch)
+	go c.ClusterInformer.Run(clusterPolStopCh)
+	go c.NamespaceInformer.Run(polStopCh)
 
 	for {
-		fmt.Println(c.CacheIndex)
-		time.Sleep(2 * time.Second)
+		select {
+		case err := <-clusterPolStopCh:
+			logrus.Fatal("cluster policy informer failed %v", err)
+		case err := <-polStopCh:
+			logrus.Fatal("namespace policy informer failed %v", err)
+		}
 	}
-
-	// <-ch
 }
 
 // Reconcile() -> reconciles cache with resources in the cluster (using informers)

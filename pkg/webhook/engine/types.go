@@ -1,6 +1,7 @@
 package engine
 
 import (
+	"github.come/RedLabsPlatform/kube-shield/pkg/webhook/cache"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
@@ -43,4 +44,8 @@ type Rule struct {
 	Field    string `json:"field"`
 	Operator string `json:"operator"`
 	Value    string `json:"value"`
+}
+
+type Engine struct {
+	Cache *cache.CacheController
 }

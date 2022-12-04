@@ -21,7 +21,7 @@ type CacheIndex struct {
 	Policies map[Namespace]map[Group]map[Version]map[Kind][]PolicyName
 }
 
-type CacheController struct {
+type Controller struct {
 	ClusterInformer   cache.SharedIndexInformer
 	NamespaceInformer cache.SharedIndexInformer
 	CacheIndex        *CacheIndex

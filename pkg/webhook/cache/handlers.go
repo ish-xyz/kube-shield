@@ -22,7 +22,7 @@ func getGV(info string) (Group, Version) {
 	return Group(group), Version(version)
 }
 
-func (c *CacheController) onPolicyUpdate(oldObj interface{}, newObj interface{}) {
+func (c *Controller) onPolicyUpdate(oldObj interface{}, newObj interface{}) {
 
 	var oldPolicy *engine.Policy
 	var newPolicy *engine.Policy
@@ -47,7 +47,7 @@ func (c *CacheController) onPolicyUpdate(oldObj interface{}, newObj interface{})
 	c.CacheIndex.Unlock()
 }
 
-func (c *CacheController) onPolicyAdd(obj interface{}) {
+func (c *Controller) onPolicyAdd(obj interface{}) {
 
 	var policy *engine.Policy
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(obj.(*unstructured.Unstructured).Object, &policy)
@@ -64,7 +64,7 @@ func (c *CacheController) onPolicyAdd(obj interface{}) {
 	}
 }
 
-func (c *CacheController) onPolicyDelete(obj interface{}) {
+func (c *Controller) onPolicyDelete(obj interface{}) {
 	var policy *engine.Policy
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(obj.(*unstructured.Unstructured).Object, &policy)
 	if err != nil {
@@ -80,7 +80,7 @@ func (c *CacheController) onPolicyDelete(obj interface{}) {
 	}
 }
 
-func (c *CacheController) onClusterPolicyUpdate(oldObj interface{}, newObj interface{}) {
+func (c *Controller) onClusterPolicyUpdate(oldObj interface{}, newObj interface{}) {
 
 	var oldPolicy *engine.ClusterPolicy
 	var newPolicy *engine.ClusterPolicy
@@ -105,7 +105,7 @@ func (c *CacheController) onClusterPolicyUpdate(oldObj interface{}, newObj inter
 	c.CacheIndex.Unlock()
 }
 
-func (c *CacheController) onClusterPolicyAdd(obj interface{}) {
+func (c *Controller) onClusterPolicyAdd(obj interface{}) {
 	var clusterpolicy *engine.ClusterPolicy
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(obj.(*unstructured.Unstructured).Object, &clusterpolicy)
 	if err != nil {
@@ -121,7 +121,7 @@ func (c *CacheController) onClusterPolicyAdd(obj interface{}) {
 	}
 }
 
-func (c *CacheController) onClusterPolicyDelete(obj interface{}) {
+func (c *Controller) onClusterPolicyDelete(obj interface{}) {
 
 	var clusterpolicy *engine.ClusterPolicy
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(obj.(*unstructured.Unstructured).Object, &clusterpolicy)
