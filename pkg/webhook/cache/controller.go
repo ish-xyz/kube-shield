@@ -42,6 +42,7 @@ func NewCacheController(clientset dynamic.Interface, c *CacheIndex) *Controller 
 	}
 }
 
+// Registers handlers for ClusterPolicies and Policies informers and start them
 func (c *Controller) Run(polStopCh <-chan struct{}, clusterPolStopCh <-chan struct{}) {
 
 	// Register handlers
@@ -69,8 +70,3 @@ func (c *Controller) Run(polStopCh <-chan struct{}, clusterPolStopCh <-chan stru
 		}
 	}
 }
-
-// Reconcile() -> reconciles cache with resources in the cluster (using informers)
-/*
-	should list every cluster policy and every policy in each namespace and add it to the index
-*/
