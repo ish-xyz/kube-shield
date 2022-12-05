@@ -1,8 +1,14 @@
 
 ## Generating new CRDs:
 
-if you made some changes to pkg/apis/*_types.go you most likely want to generate new CRDs. To do that you can run:
-`go generate` which will create the new CRDs under `./crd-gen/*`.
+if you made some changes to pkg/apis/*_types.go you most likely want to generate new CRDs. 
+
+To do that you can run:
+```
+go generate
+```
+which will create the new CRDs under `./crd-gen/*`.
+
 
 If the above command doesn't work, you can troubleshoot by running:
 
