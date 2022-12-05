@@ -9,25 +9,21 @@ type Config struct {
 	Path           string `validate:"required"`
 	TLSKey         string `validate:"required"`
 	TLSCert        string `validate:"required"`
-	Register       bool
-	Debug          bool
 	MetricsAddress string `validate:"required"`
 	MetricsPath    string `validate:"required"`
+	Debug          bool
 }
 
-func NewConfig(addr, path, key, cert string,
-	register, debug bool,
-	metricsAddr, metricsPath string) *Config {
+func NewConfig(addr, path, key, cert string, debug bool, metricsAddr, metricsPath string) *Config {
 
 	return &Config{
 		Address:        addr,
 		Path:           path,
 		TLSKey:         key,
 		TLSCert:        cert,
-		Register:       register,
-		Debug:          debug,
 		MetricsAddress: metricsAddr,
 		MetricsPath:    metricsPath,
+		Debug:          debug,
 	}
 }
 

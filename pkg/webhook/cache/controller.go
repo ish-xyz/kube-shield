@@ -3,7 +3,7 @@ package cache
 import (
 	"time"
 
-	"github.com/RedLabsPlatform/kube-shield/pkg/config/defaults"
+	v1 "github.com/RedLabsPlatform/kube-shield/pkg/apis/v1"
 	"github.com/sirupsen/logrus"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
@@ -22,15 +22,15 @@ func NewEmptyCacheIndex() *CacheIndex {
 func NewCacheController(clientset dynamic.Interface, c *CacheIndex) *Controller {
 
 	clusterPolicy := schema.GroupVersionResource{
-		Group:    defaults.CR_GROUP,
-		Version:  defaults.CR_VERSION,
-		Resource: defaults.CLUSTER_POLICY_KIND,
+		Group:    v1.GroupVersion.Group,
+		Version:  v1.GroupVersion.Version,
+		Resource: v1.ClusterPolicyKind,
 	}
 
 	policy := schema.GroupVersionResource{
-		Group:    defaults.CR_GROUP,
-		Version:  defaults.CR_VERSION,
-		Resource: defaults.POLICY_KIND,
+		Group:    v1.GroupVersion.Group,
+		Version:  v1.GroupVersion.Version,
+		Resource: v1.PolicyKind,
 	}
 
 	factory := dynamicinformer.NewFilteredDynamicSharedInformerFactory(clientset, time.Minute, metav1.NamespaceAll, nil)

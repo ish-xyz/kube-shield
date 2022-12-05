@@ -29,6 +29,12 @@ var (
 	// GroupVersion is group version used to register these objects
 	GroupVersion = schema.GroupVersion{Group: "kube-shield.red-labs.co.uk", Version: "v1"}
 
+	// Cluster Policy Kind (string)
+	ClusterPolicyKind = "ClusterPolicy"
+
+	// Policy Kind (string)
+	PolicyKind = "Policy"
+
 	// SchemeBuilder is used to add go types to the GroupVersionKind scheme
 	SchemeBuilder = &scheme.Builder{GroupVersion: GroupVersion}
 
@@ -37,5 +43,10 @@ var (
 )
 
 func init() {
-	SchemeBuilder.Register(&Policy{}, &PolicyList{}, &ClusterPolicy{}, &ClusterPolicyList{})
+	SchemeBuilder.Register(
+		&Policy{},
+		&PolicyList{},
+		&ClusterPolicy{},
+		&ClusterPolicyList{},
+	)
 }
