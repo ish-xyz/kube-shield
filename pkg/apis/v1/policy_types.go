@@ -70,18 +70,3 @@ type Check struct {
 func init() {
 	SchemeBuilder.Register(&Policy{}, &PolicyList{})
 }
-
-// type ClusterPolicy struct {
-// 	metav1.TypeMeta   `json:",inline"`
-// 	metav1.ObjectMeta `json:"metadata,omitempty"`
-// 	Spec              ClusterPolicySpec `json:"spec,omitempty"`
-// }
-
-// type ClusterPolicySpec struct {
-// 	DefaultBehaviour string             `json:"defaultBehaviour"`
-// 	ApplyOn          []*ResourceAddress `json:"applyOn"`
-// 	Policies         []struct {
-// 		Name  string  `json:"name"`
-// 		Rules []*Rule `json:"rules"`
-// 	} `json:"policies"`
-// }
