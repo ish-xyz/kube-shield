@@ -7,7 +7,7 @@ To do that you can run:
 ```
 go generate
 ```
-which will create the new CRDs under `./crd-gen/*`.
+which will create the new CRDs under `./crds/*`.
 
 
 If the above command doesn't work, you can troubleshoot by running:
