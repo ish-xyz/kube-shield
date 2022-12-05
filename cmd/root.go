@@ -42,7 +42,6 @@ func init() {
 	Cmd.Flags().String("tls-cert", "/etc/kube-shield/tls/cert.pem", "Path to the tls certificate")
 	Cmd.Flags().String("metrics-address", "0.0.0.0:3000", "Address where the metrics are exposed")
 	Cmd.Flags().String("metrics-path", "/metrics", "Path where the metrics are exposed")
-	Cmd.Flags().BoolP("register-webhook", "r", true, "create ValidatingWebhookConfiguration resource in the current Kubernetes")
 	Cmd.Flags().BoolP("debug", "d", false, "debug mode")
 
 	viper.BindPFlag("web.address", Cmd.Flags().Lookup("web-address"))
@@ -51,7 +50,6 @@ func init() {
 	viper.BindPFlag("web.tls.cert", Cmd.Flags().Lookup("tls-cert"))
 	viper.BindPFlag("kubeconfig", Cmd.Flags().Lookup("kubeconfig"))
 	viper.BindPFlag("policies", Cmd.Flags().Lookup("policies"))
-	viper.BindPFlag("register", Cmd.Flags().Lookup("register-webhook"))
 	viper.BindPFlag("debug", Cmd.Flags().Lookup("debug"))
 	viper.BindPFlag("metrics.address", Cmd.Flags().Lookup("metrics-address"))
 	viper.BindPFlag("metrics.path", Cmd.Flags().Lookup("metrics-path"))
@@ -78,7 +76,6 @@ func start(cmd *cobra.Command, args []string) {
 		viper.GetString("web.path"),
 		viper.GetString("web.tls.key"),
 		viper.GetString("web.tls.cert"),
-		viper.GetBool("register"),
 		viper.GetBool("debug"),
 		viper.GetString("metrics.address"),
 		viper.GetString("metrics.path"),
