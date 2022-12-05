@@ -3,7 +3,7 @@ package cache
 import (
 	"strings"
 
-	v1 "github.com/RedLabsPlatform/kube-shield/pkg/apis/kube-shield.red-labs.co.uk/v1"
+	v1 "github.com/RedLabsPlatform/kube-shield/pkg/apis/v1"
 	"github.com/sirupsen/logrus"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"

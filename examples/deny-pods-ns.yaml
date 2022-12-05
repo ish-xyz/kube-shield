@@ -8,9 +8,9 @@ spec:
     - apiVersion: v1
       kind: Pod
   defaultBehaviour: IfMatchDeny
-  policies:
+  rules:
   - name: rule-name
-    rules:
+    data:
     - key: $input.metadata.namespace
       operator: Regex
       value: ^(kube-system|default)$
@@ -20,7 +20,7 @@ spec:
       value: $input.spec.container[_].resources.requests.memory
   # OR
   - name: second-rule-name
-    rules:
+    data:
     - key: $input.metadata.namespace
       operator: Regex
       value: ^(kube-system|default)$
