@@ -35,7 +35,7 @@ func (c *Controller) onPolicyUpdate(oldObj interface{}, newObj interface{}) {
 	errOldPol := runtime.DefaultUnstructuredConverter.FromUnstructured(oldObj.(*unstructured.Unstructured).Object, &oldPolicy)
 	errNewPol := runtime.DefaultUnstructuredConverter.FromUnstructured(newObj.(*unstructured.Unstructured).Object, &newPolicy)
 	if errOldPol != nil || errNewPol != nil {
-		logrus.Fatal("failed to unmarshal unstructured object into Policy %v %v", errOldPol, errNewPol)
+		logrus.Fatalf("failed to unmarshal unstructured object into Policy %v %v", errOldPol, errNewPol)
 		return
 	}
 
@@ -98,7 +98,7 @@ func (c *Controller) onClusterPolicyUpdate(oldObj interface{}, newObj interface{
 	errOldPol := runtime.DefaultUnstructuredConverter.FromUnstructured(oldObj.(*unstructured.Unstructured).Object, &oldPolicy)
 	errNewPol := runtime.DefaultUnstructuredConverter.FromUnstructured(newObj.(*unstructured.Unstructured).Object, &newPolicy)
 	if errOldPol != nil || errNewPol != nil {
-		logrus.Fatal("failed to unmarshal unstructured object into ClusterPolicy %v %v", errOldPol, errNewPol)
+		logrus.Fatalf("failed to unmarshal unstructured object into ClusterPolicy %v %v", errOldPol, errNewPol)
 		return
 	}
 

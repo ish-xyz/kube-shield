@@ -12,13 +12,6 @@ import (
 	kcache "k8s.io/client-go/tools/cache"
 )
 
-func NewEmptyCacheIndex() *CacheIndex {
-
-	return &CacheIndex{
-		Policies: make(map[Namespace]map[Group]map[Version]map[Kind][]PolicyName),
-	}
-}
-
 func NewCacheController(clientset dynamic.Interface, c *CacheIndex) *Controller {
 
 	clusterPolicy := schema.GroupVersionResource{
@@ -64,9 +57,9 @@ func (c *Controller) Run(polStopCh <-chan struct{}, clusterPolStopCh <-chan stru
 	for {
 		select {
 		case err := <-clusterPolStopCh:
-			logrus.Fatal("cluster policy informer failed %v", err)
+			logrus.Fatalf("cluster policy informer failed %v", err)
 		case err := <-polStopCh:
-			logrus.Fatal("namespace policy informer failed %v", err)
+			logrus.Fatalf("namespace policy informer failed %v", err)
 		}
 	}
 }

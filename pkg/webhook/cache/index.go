@@ -1,5 +1,12 @@
 package cache
 
+func NewCacheIndex() *CacheIndex {
+
+	return &CacheIndex{
+		Policies: make(map[Namespace]map[Group]map[Version]map[Kind][]PolicyName),
+	}
+}
+
 // Add resource address into Cache Index
 // Resource address example: NS/GROUP/VERSION/KIND/RULENAME
 func (c *CacheIndex) Add(ns Namespace, grp Group, ver Version, kind Kind, name PolicyName) {
