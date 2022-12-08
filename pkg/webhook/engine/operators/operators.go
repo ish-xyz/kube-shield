@@ -1,16 +1,10 @@
 package operators
 
 import (
-	"strings"
+	"fmt"
 
 	v1 "github.com/RedLabsPlatform/kube-shield/pkg/apis/v1"
-	"github.com/tidwall/gjson"
 )
-
-func getValues(address string, jsonData string) []gjson.Result {
-	address = strings.TrimPrefix(address, "$_.")
-	return gjson.Get(jsonData, address).Array()
-}
 
 func Equal(rawPayload string, check *v1.Check) bool {
 
@@ -24,8 +18,10 @@ func Equal(rawPayload string, check *v1.Check) bool {
 	}
 
 	// Exit at the first non matching value of the array
-	for _, retrievedVal := range values {
-		val = retrievedVal.Raw
+	for _, v := range values {
+		val = getTypedValue(v)
+		fmt.Println(val)
+		fmt.Println(check.Value)
 		if val != check.Value {
 			return false
 		}

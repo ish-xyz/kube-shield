@@ -12,22 +12,22 @@ func TestGetValue(t *testing.T) {
 	assert.Equal(t, getValues("$_.map.with.some", jsonData)[0].Str, "values")
 }
 
-func TestEqual(t *testing.T) {
-	jsonData := `{"map": {"with": {"some":"values"}}, "other": ["values", "values"]}`
-	chk := &v1.Check{
+func TestEqualStrings(t *testing.T) {
+	jsonData := `{"map": {"with": {"some": "values" }}, "other": ["values", "values"]}`
+	check1 := &v1.Check{
 		Field:    "$_.map.with.some",
 		Operator: "Equal",
 		Value:    "values",
 	}
 
-	multiChk := &v1.Check{
+	check2 := &v1.Check{
 		Field:    "$_.other",
 		Operator: "Equal",
 		Value:    "values",
 	}
 
-	assert.Equal(t, Equal(jsonData, chk), true)
-	assert.Equal(t, Equal(jsonData, multiChk), true)
+	assert.Equal(t, true, Equal(jsonData, check1))
+	assert.Equal(t, true, Equal(jsonData, check2))
 }
 
 func TestEqualTypeMismatch(t *testing.T) {
@@ -35,10 +35,39 @@ func TestEqualTypeMismatch(t *testing.T) {
 	check1 := &v1.Check{
 		Field:    "$_.value",
 		Operator: "Equal",
+		Value:    true,
+	}
+	check2 := &v1.Check{
+		Field:    "$_.value",
+		Operator: "Equal",
 		Value:    "true",
 	}
 
+	assert.Equal(t, true, Equal(jsonData, check1))
+	assert.Equal(t, false, Equal(jsonData, check2))
+}
+
+func TestEqualNumbers(t *testing.T) {
+	jsonData := `{"value": 1, "float": 1.25}`
+	check1 := &v1.Check{
+		Field:    "$_.value",
+		Operator: "Equal",
+		Value:    1,
+	}
+	check2 := &v1.Check{
+		Field:    "$_.value",
+		Operator: "Equal",
+		Value:    "1",
+	}
+	check3 := &v1.Check{
+		Field:    "$_.float",
+		Operator: "Equal",
+		Value:    1.25,
+	}
+
 	assert.Equal(t, Equal(jsonData, check1), true)
+	assert.Equal(t, Equal(jsonData, check2), false)
+	assert.Equal(t, Equal(jsonData, check3), true)
 }
 
 func TestEqualEmptyValue(t *testing.T) {
