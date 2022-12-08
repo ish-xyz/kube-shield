@@ -4,7 +4,7 @@ import (
 	"fmt"
 )
 
-func Load(rawResRequest []byte) {
+func Load(rawRequest []byte) {
 	fmt.Println("TODO")
 
 	/*

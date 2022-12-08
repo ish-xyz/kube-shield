@@ -59,12 +59,13 @@ type ResourceAddress struct {
 
 type Check struct {
 	// +kubebuilder:validation:Required
+	// +kubebuilder:validation:Pattern=^\$*$
 	Field string `json:"field"`
 	// +kubebuilder:validation:Required
 	// +kubebuilder:validation:Enum=GreaterThan;LowerThan;Equal;NotEqual;Regex;Len
 	Operator string `json:"operator"`
 	// +kubebuilder:validation:Required
-	Value string `json:"value"`
+	Value interface{} `json:"value"`
 }
 
 func init() {
