@@ -1,12 +1,10 @@
 package operators
 
 import (
-	"fmt"
-
 	v1 "github.com/RedLabsPlatform/kube-shield/pkg/apis/v1"
 )
 
-func Equal(rawPayload string, check *v1.Check) bool {
+func equal(rawPayload string, check *v1.Check) bool {
 
 	var val interface{}
 
@@ -20,8 +18,6 @@ func Equal(rawPayload string, check *v1.Check) bool {
 	// Exit at the first non matching value of the array
 	for _, v := range values {
 		val = getTypedValue(v)
-		fmt.Println(val)
-		fmt.Println(check.Value)
 		if val != check.Value {
 			return false
 		}
@@ -30,21 +26,24 @@ func Equal(rawPayload string, check *v1.Check) bool {
 	return true
 }
 
-// func NotEqual(rawPayload string, check *v1.Check) bool {
+func notEqual(rawPayload string, check *v1.Check) bool {
 
-// 	var val interface{}
+	var val interface{}
 
-// 	values := getValues(check.Field, rawPayload)
-// 	if len(values) < 1 && check.Value == "" {
-// 		return false
-// 	}
+	values := getValues(check.Field, rawPayload)
 
-// 	for _, retrievedVal := range values {
-// 		val = retrievedVal.Str
-// 		if val == check.Value {
-// 			return false
-// 		}
-// 	}
+	// Matching empty values should be returned immediately
+	if len(values) < 1 && check.Value == "" {
+		return false
+	}
 
-// 	return true
-// }
+	// Exit at the first matching value of the array
+	for _, v := range values {
+		val = getTypedValue(v)
+		if val == check.Value {
+			return false
+		}
+	}
+
+	return true
+}

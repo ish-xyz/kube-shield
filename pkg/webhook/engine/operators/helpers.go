@@ -3,6 +3,7 @@ package operators
 import (
 	"strings"
 
+	v1 "github.com/RedLabsPlatform/kube-shield/pkg/apis/v1"
 	"github.com/tidwall/gjson"
 )
 
@@ -33,4 +34,8 @@ func getTypedValue(v gjson.Result) interface{} {
 	default:
 		return v.Raw
 	}
+}
+
+func Dispatch(rawPayload string, check *v1.Check) bool {
+	return false
 }

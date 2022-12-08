@@ -26,8 +26,8 @@ func TestEqualStrings(t *testing.T) {
 		Value:    "values",
 	}
 
-	assert.Equal(t, true, Equal(jsonData, check1))
-	assert.Equal(t, true, Equal(jsonData, check2))
+	assert.Equal(t, true, equal(jsonData, check1))
+	assert.Equal(t, true, equal(jsonData, check2))
 }
 
 func TestEqualTypeMismatch(t *testing.T) {
@@ -43,8 +43,8 @@ func TestEqualTypeMismatch(t *testing.T) {
 		Value:    "true",
 	}
 
-	assert.Equal(t, true, Equal(jsonData, check1))
-	assert.Equal(t, false, Equal(jsonData, check2))
+	assert.Equal(t, true, equal(jsonData, check1))
+	assert.Equal(t, false, equal(jsonData, check2))
 }
 
 func TestEqualNumbers(t *testing.T) {
@@ -65,9 +65,9 @@ func TestEqualNumbers(t *testing.T) {
 		Value:    1.25,
 	}
 
-	assert.Equal(t, Equal(jsonData, check1), true)
-	assert.Equal(t, Equal(jsonData, check2), false)
-	assert.Equal(t, Equal(jsonData, check3), true)
+	assert.Equal(t, true, equal(jsonData, check1))
+	assert.Equal(t, false, equal(jsonData, check2))
+	assert.Equal(t, true, equal(jsonData, check3))
 }
 
 func TestEqualEmptyValue(t *testing.T) {
@@ -78,31 +78,5 @@ func TestEqualEmptyValue(t *testing.T) {
 		Value:    "true",
 	}
 
-	assert.Equal(t, Equal(jsonData, check1), false)
+	assert.Equal(t, false, equal(jsonData, check1))
 }
-
-// func TestNotEqual(t *testing.T) {
-// 	jsonData := `{"some":"values", "other": [{"status": "someval"}, {"status": "myval"}]}`
-// 	chk := &v1.Check{
-// 		Field:    "$_.some",
-// 		Operator: "NotEqual",
-// 		Value:    "not-equal-value",
-// 	}
-
-// 	multiChk := &v1.Check{
-// 		Field:    "$_.other.#.status",
-// 		Operator: "NotEqual",
-// 		Value:    "myval",
-// 	}
-
-// 	assert.Equal(
-// 		t,
-// 		NotEqual(jsonData, chk),
-// 		true,
-// 	)
-// 	assert.Equal(
-// 		t,
-// 		NotEqual(jsonData, multiChk),
-// 		false,
-// 	)
-// }
