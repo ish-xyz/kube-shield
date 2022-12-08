@@ -61,7 +61,7 @@ type Check struct {
 	// +kubebuilder:validation:Required
 	Field string `json:"field"`
 	// +kubebuilder:validation:Required
-	// +kubebuilder:validation:Enum=GreaterThan;LowerThan;Equal;NotEqual;Regex
+	// +kubebuilder:validation:Enum=GreaterThan;LowerThan;Equal;NotEqual;Regex;Len
 	Operator string `json:"operator"`
 	// +kubebuilder:validation:Required
 	Value string `json:"value"`
