@@ -24,7 +24,7 @@ func getTypedValue(v gjson.Result) interface{} {
 		if isInt(v.Num) {
 			return int(v.Num)
 		}
-		return v.Num
+		return float64(v.Num)
 	case "True":
 		return true
 	case "False":
@@ -38,4 +38,17 @@ func getTypedValue(v gjson.Result) interface{} {
 
 func Dispatch(rawPayload string, check *v1.Check) bool {
 	return false
+}
+
+func NewCheckResult() *v1.CheckResult {
+	return &v1.CheckResult{
+		Result: false,
+		Errors: make([]error, 0),
+	}
+}
+
+func UpdateCheckResult(checkRes *v1.CheckResult, res bool, err error) *v1.CheckResult {
+	checkRes.Result = res
+	checkRes.Errors = append(checkRes.Errors, err)
+	return checkRes
 }

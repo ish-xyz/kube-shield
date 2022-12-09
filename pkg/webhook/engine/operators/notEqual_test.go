@@ -21,8 +21,8 @@ func TestNotEqualStrings(t *testing.T) {
 		Value:    "not-equal",
 	}
 
-	assert.Equal(t, true, notEqual(jsonData, check1))
-	assert.Equal(t, true, notEqual(jsonData, check2))
+	assert.Equal(t, true, notEqual(jsonData, check1).Result)
+	assert.Equal(t, true, notEqual(jsonData, check2).Result)
 }
 
 func TestNotEqualTypeMismatch(t *testing.T) {
@@ -38,8 +38,8 @@ func TestNotEqualTypeMismatch(t *testing.T) {
 		Value:    "true",
 	}
 
-	assert.Equal(t, false, notEqual(jsonData, check1))
-	assert.Equal(t, true, notEqual(jsonData, check2))
+	assert.Equal(t, false, notEqual(jsonData, check1).Result)
+	assert.Equal(t, true, notEqual(jsonData, check2).Result)
 }
 
 func TestNotEqualNumbers(t *testing.T) {
@@ -60,9 +60,9 @@ func TestNotEqualNumbers(t *testing.T) {
 		Value:    1.25,
 	}
 
-	assert.Equal(t, false, notEqual(jsonData, check1))
-	assert.Equal(t, true, notEqual(jsonData, check2))
-	assert.Equal(t, false, notEqual(jsonData, check3))
+	assert.Equal(t, false, notEqual(jsonData, check1).Result)
+	assert.Equal(t, true, notEqual(jsonData, check2).Result)
+	assert.Equal(t, false, notEqual(jsonData, check3).Result)
 }
 
 func TestNotEqualEmptyValue(t *testing.T) {
@@ -73,5 +73,5 @@ func TestNotEqualEmptyValue(t *testing.T) {
 		Value:    "true",
 	}
 
-	assert.Equal(t, true, notEqual(jsonData, check1))
+	assert.Equal(t, true, notEqual(jsonData, check1).Result)
 }

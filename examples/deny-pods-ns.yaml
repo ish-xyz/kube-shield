@@ -21,6 +21,9 @@ spec:
   # OR
   - name: second-rule-name
     data:
+    # - field: $_.metadata.namespace
+    #   regex: ^(kube-system|default)
+ 
     - key: $input.metadata.namespace
       operator: Regex
       value: ^(kube-system|default)$
