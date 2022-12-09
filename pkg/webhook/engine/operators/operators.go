@@ -59,8 +59,7 @@ func regex(rawPayload string, check *v1.Check) *v1.CheckResult {
 
 	for _, v := range values {
 
-		// TODO type conversion is broken
-		res, err := regexp.MatchString(fmt.Sprintf("%v", check.Value), v.Str)
+		res, err := regexp.MatchString(fmt.Sprintf("%v", check.Value), fmt.Sprintf("%v", getTypedValue(v)))
 
 		if err == nil && !res {
 			err = fmt.Errorf("regex '%v'does not match for value '%v'", check.Value, v)
@@ -68,6 +67,23 @@ func regex(rawPayload string, check *v1.Check) *v1.CheckResult {
 		if !res {
 			return UpdateCheckResult(checkRes, res, err)
 		}
+	}
+
+	return UpdateCheckResult(checkRes, true, nil)
+}
+
+func count(rawPayload string, check *v1.Check) *v1.CheckResult {
+	checkRes := NewCheckResult()
+	values := getValues(check.Field, rawPayload)
+
+	valuesNStr := fmt.Sprintf("%v", len(values))
+
+	if valuesNStr != fmt.Sprintf("%v", check.Value) {
+		return UpdateCheckResult(
+			checkRes,
+			false,
+			fmt.Errorf("counted '%s' elements, policy has set '%v' elements", valuesNStr, check.Value),
+		)
 	}
 
 	return UpdateCheckResult(checkRes, true, nil)

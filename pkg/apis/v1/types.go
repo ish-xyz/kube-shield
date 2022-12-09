@@ -12,7 +12,7 @@ type Check struct {
 	// +kubebuilder:validation:Pattern=^\$*$
 	Field string `json:"field"`
 	// +kubebuilder:validation:Required
-	// +kubebuilder:validation:Enum=GreaterThan;LowerThan;Equal;NotEqual;Regex;Len
+	// +kubebuilder:validation:Enum=GreaterThan;LowerThan;Equal;NotEqual;Regex;Count
 	Operator string `json:"operator"`
 	// +kubebuilder:validation:Required
 	Value interface{} `json:"value"`
