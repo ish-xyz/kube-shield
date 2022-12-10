@@ -7,79 +7,77 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestGetValue(t *testing.T) {
-	jsonData := `{"map": {"with": {"some":"values"}}}`
-	assert.Equal(t, getValues("$_.map.with.some", jsonData)[0].Str, "values")
+func TestEqual(t *testing.T) {
+
+	payload := `{ "my": {"data":"mydata"}}`
+	check := &v1.Check{
+		Field:    "$_.my.data",
+		Operator: "Equal",
+		Value:    "mydata",
+	}
+
+	res := equal(payload, check)
+
+	assert.Equal(t, res.Error, "")
+	assert.Equal(t, res.Result, true)
 }
 
-func TestEqualStrings(t *testing.T) {
-	jsonData := `{"map": {"with": {"some": "values" }}, "other": ["values", "values"]}`
-	check1 := &v1.Check{
-		Field:    "$_.map.with.some",
+func TestEqualFailed(t *testing.T) {
+
+	payload := `{ "my": {"data":"mydata"}}`
+	check := &v1.Check{
+		Field:    "$_.my.data",
 		Operator: "Equal",
-		Value:    "values",
+		Value:    "FAILED",
 	}
 
-	check2 := &v1.Check{
-		Field:    "$_.other",
-		Operator: "Equal",
-		Value:    "values",
-	}
+	res := equal(payload, check)
 
-	res1 := equal(jsonData, check1)
-	res2 := equal(jsonData, check2)
-
-	assert.Equal(t, true, res1.Result)
-	assert.Equal(t, true, res2.Result)
+	assert.NotEqual(t, res.Error, "")
+	assert.Equal(t, res.Result, false)
 }
 
-func TestEqualTypeMismatch(t *testing.T) {
-	jsonData := `{"value": true}`
-	check1 := &v1.Check{
-		Field:    "$_.value",
+func TestEqualTypeMismatchBool(t *testing.T) {
+
+	payload := `{ "my": {"data": false }}`
+	check := &v1.Check{
+		Field:    "$_.my.data",
 		Operator: "Equal",
-		Value:    true,
-	}
-	check2 := &v1.Check{
-		Field:    "$_.value",
-		Operator: "Equal",
-		Value:    "true",
+		Value:    "false",
 	}
 
-	assert.Equal(t, true, equal(jsonData, check1).Result)
-	assert.Equal(t, false, equal(jsonData, check2).Result)
+	res := equal(payload, check)
+
+	assert.Equal(t, res.Error, "")
+	assert.Equal(t, res.Result, true)
 }
 
-func TestEqualNumbers(t *testing.T) {
-	jsonData := `{"value": 1, "float": 1.25}`
-	check1 := &v1.Check{
-		Field:    "$_.value",
-		Operator: "Equal",
-		Value:    1,
-	}
-	check2 := &v1.Check{
-		Field:    "$_.value",
+func TestEqualTypeMismatchInt(t *testing.T) {
+
+	payload := `{ "my": {"data": 1 }}`
+	check := &v1.Check{
+		Field:    "$_.my.data",
 		Operator: "Equal",
 		Value:    "1",
 	}
-	check3 := &v1.Check{
-		Field:    "$_.float",
-		Operator: "Equal",
-		Value:    1.25,
-	}
 
-	assert.Equal(t, true, equal(jsonData, check1).Result)
-	assert.Equal(t, false, equal(jsonData, check2).Result)
-	assert.Equal(t, true, equal(jsonData, check3).Result)
+	res := equal(payload, check)
+
+	assert.Equal(t, res.Error, "")
+	assert.Equal(t, res.Result, true)
 }
 
-func TestEqualEmptyValue(t *testing.T) {
-	jsonData := `{"value": true}`
-	check1 := &v1.Check{
-		Field:    "$_.EMPTYVAL",
+func TestEqualTypeMismatchFloat(t *testing.T) {
+
+	payload := `{ "my": {"data": 1.25 }}`
+	check := &v1.Check{
+		Field:    "$_.my.data",
 		Operator: "Equal",
-		Value:    "true",
+		Value:    "1.25",
 	}
 
-	assert.Equal(t, false, equal(jsonData, check1).Result)
+	res := equal(payload, check)
+
+	assert.Equal(t, res.Error, "")
+	assert.Equal(t, res.Result, true)
 }
