@@ -8,25 +8,22 @@ import (
 
 	v1 "github.com/RedLabsPlatform/kube-shield/pkg/apis/v1"
 	"github.com/tidwall/gjson"
+	"golang.org/x/exp/constraints"
 )
 
-type Number interface {
-	int64 | float64
+type GenericNumber interface {
+	constraints.Float | constraints.Integer
 }
 
-func getNumber[T Number](v string) (T, error) {
+func getNumber(v string) (float64, error) {
 
-	numInt, err := strconv.Atoi(v)
-	if err == nil {
-		return T(numInt), nil
+	val, err := strconv.ParseFloat(v, 64)
+	if err != nil {
+		return 0, fmt.Errorf("failed to convert to number: %v", err)
 	}
 
-	numFloat, err := strconv.ParseFloat(v, 64)
-	if err == nil {
-		return T(numFloat), nil
-	}
+	return val, err
 
-	return T(0), fmt.Errorf("can't convert string %s into float64 or int64", v)
 }
 
 func isInt(v float64) bool {

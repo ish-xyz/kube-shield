@@ -6,7 +6,14 @@ import (
 	v1 "github.com/RedLabsPlatform/kube-shield/pkg/apis/v1"
 )
 
-func equal(rawPayload string, check *v1.Check) *v1.CheckResult {
+const (
+	GREATER  = "GreaterThan"
+	LOWER    = "LowerThan"
+	EQUAL    = "Equal"
+	NOTEQUAL = "NOTEQUAL"
+)
+
+func compareStrings(rawPayload string, check *v1.Check) *v1.CheckResult {
 
 	var err string
 	values := getValues(check.Field, rawPayload)
@@ -29,14 +36,41 @@ func equal(rawPayload string, check *v1.Check) *v1.CheckResult {
 
 func compareNumbers(rawPayload string, check *v1.Check) *v1.CheckResult {
 
-	// convert Strings
-
-	val, err := getNumber[Number](check.Value)
+	valN, err := getNumber(check.Value)
 	if err != nil {
-		return CreateCheckResult(false, fmt.Sprintf("can't convert value '%s' to number", check.Value))
+		return CreateCheckResult(
+			true,
+			fmt.Sprintf("failed to convert number '%s': '%v'", check.Value, err),
+		)
 	}
 
-	fmt.Println(val)
+	values := getValues(check.Field, rawPayload)
+	for _, v := range values {
+		payloadN, err := getNumber(getStringValue(v))
+		if err != nil {
+			return CreateCheckResult(
+				true,
+				fmt.Sprintf("failed to convert number '%s': '%v'", getStringValue(v), err),
+			)
+		}
+		if check.Operator == GREATER {
+			if payloadN <= valN {
+				return CreateCheckResult(
+					false,
+					"retrieved value '%d' is lower than policy value '%d'",
+				)
+			}
+		}
+
+		if check.Operator == LOWER {
+			if payloadN >= valN {
+				return CreateCheckResult(
+					false,
+					"retrieved value '%d' is lower than policy value '%d'",
+				)
+			}
+		}
+	}
 
 	return CreateCheckResult(true, "")
 }

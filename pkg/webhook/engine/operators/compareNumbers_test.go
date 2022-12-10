@@ -1,25 +1,38 @@
 package operators
 
 import (
-	"fmt"
 	"testing"
 
 	v1 "github.com/RedLabsPlatform/kube-shield/pkg/apis/v1"
 	"github.com/stretchr/testify/assert"
 )
 
-func TestCompareNumbersNoNum(t *testing.T) {
-	check := &v1.Check{
-		Field:    "$_.value",
+func TestCompareNumbers(t *testing.T) {
+
+	check1 := &v1.Check{
+		Field:    "$_.value1",
 		Operator: "GreaterThan",
 		Value:    "1.25",
 	}
+	check2 := &v1.Check{
+		Field:    "$_.value1",
+		Operator: "LowerThan",
+		Value:    "1.10",
+	}
 
-	payload := `{"value": 1.25}`
+	check3 := &v1.Check{
+		Field:    "$_.value1",
+		Operator: "GreaterThan",
+		Value:    "1.13",
+	}
 
-	res := compareNumbers(payload, check)
+	payload := `{"value1": 1.25, "value2": 1.10, "value3": 1.12}`
 
-	fmt.Println(res)
+	res1 := compareNumbers(payload, check1)
+	res2 := compareNumbers(payload, check2)
+	res3 := compareNumbers(payload, check3)
 
-	assert.Equal(t, 1, 2)
+	assert.Equal(t, res1.Result, false)
+	assert.Equal(t, res2.Result, false)
+	assert.Equal(t, res3.Result, true)
 }

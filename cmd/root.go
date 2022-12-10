@@ -97,7 +97,7 @@ func start(cmd *cobra.Command, args []string) {
 
 	dc, err := dynamic.NewForConfig(kubecfg)
 
-	index := cache.NewEmptyCacheIndex()
+	index := cache.NewCacheIndex()
 	cachectrl := cache.NewCacheController(dc, index)
 	cachectrl.Run(make(chan struct{}), make(chan struct{}))
 }
