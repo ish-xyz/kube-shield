@@ -59,18 +59,19 @@ type ResourceAddress struct {
 
 type Check struct {
 	// +kubebuilder:validation:Required
-	// +kubebuilder:validation:Pattern=^\$*$
+	// +kubebuilder:validation:Pattern=^\$_\.*$
 	Field string `json:"field"`
 	// +kubebuilder:validation:Required
 	// +kubebuilder:validation:Enum=GreaterThan;LowerThan;Equal;NotEqual;Regex;Count
 	Operator string `json:"operator"`
+
 	// +kubebuilder:validation:Required
-	Value interface{} `json:"value"`
+	Value string `json:"value"`
 }
 
 type CheckResult struct {
-	Result bool    `json:"result"`
-	Errors []error `json:"errors"`
+	Result bool
+	Error  string
 }
 
 func init() {

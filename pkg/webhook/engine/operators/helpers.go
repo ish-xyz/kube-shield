@@ -1,14 +1,36 @@
 package operators
 
 import (
+	"fmt"
+	"strconv"
+
 	"strings"
 
 	v1 "github.com/RedLabsPlatform/kube-shield/pkg/apis/v1"
 	"github.com/tidwall/gjson"
 )
 
-func isInt(val float64) bool {
-	return val == float64(int(val))
+type Number interface {
+	int64 | float64
+}
+
+func getNumber[T Number](v string) (T, error) {
+
+	numInt, err := strconv.Atoi(v)
+	if err == nil {
+		return T(numInt), nil
+	}
+
+	numFloat, err := strconv.ParseFloat(v, 64)
+	if err == nil {
+		return T(numFloat), nil
+	}
+
+	return T(0), fmt.Errorf("can't convert string %s into float64 or int64", v)
+}
+
+func isInt(v float64) bool {
+	return v == float64(int(v))
 }
 
 func getValues(address string, jsonData string) []gjson.Result {
@@ -16,39 +38,23 @@ func getValues(address string, jsonData string) []gjson.Result {
 	return gjson.Get(jsonData, address).Array()
 }
 
-func getTypedValue(v gjson.Result) interface{} {
-	switch v.Type.String() {
-	case "String":
+func getStringValue(v gjson.Result) string {
+	if v.Str != "" {
 		return v.Str
-	case "Number":
-		if isInt(v.Num) {
-			return int(v.Num)
-		}
-		return float64(v.Num)
-	case "True":
-		return true
-	case "False":
-		return false
-	case "Null":
-		return ""
-	default:
-		return v.Raw
 	}
-}
-
-func Dispatch(rawPayload string, check *v1.Check) bool {
-	return false
+	return fmt.Sprintf("%v", v)
 }
 
 func NewCheckResult() *v1.CheckResult {
 	return &v1.CheckResult{
 		Result: false,
-		Errors: make([]error, 0),
+		Error:  "",
 	}
 }
 
-func UpdateCheckResult(checkRes *v1.CheckResult, res bool, err error) *v1.CheckResult {
-	checkRes.Result = res
-	checkRes.Errors = append(checkRes.Errors, err)
-	return checkRes
+func CreateCheckResult(res bool, msg string) *v1.CheckResult {
+	return &v1.CheckResult{
+		Result: res,
+		Error:  msg,
+	}
 }
