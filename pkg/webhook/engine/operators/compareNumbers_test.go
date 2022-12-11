@@ -36,3 +36,8 @@ func TestCompareNumbers(t *testing.T) {
 	assert.Equal(t, res2.Result, false)
 	assert.Equal(t, res3.Result, true)
 }
+
+// test invalid numbers e.g.: "13fa"
+// test very big numbers e.g.: 10000000000000000
+// test negative numbers
+// test zero
