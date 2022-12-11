@@ -10,13 +10,13 @@ const (
 	GREATER  = "GreaterThan"
 	LOWER    = "LowerThan"
 	EQUAL    = "Equal"
-	NOTEQUAL = "NOTEQUAL"
+	NOTEQUAL = "NotEqual"
 )
 
-func compareStrings(rawPayload string, check *v1.Check) *v1.CheckResult {
+func compareStrings(payload string, check *v1.Check) *v1.CheckResult {
 
 	var err string
-	values := getValues(check.Field, rawPayload)
+	values := getValues(check.Field, payload)
 
 	if len(values) < 1 && check.Value != "" {
 		err = fmt.Sprintf("field: %s returned an empty value, policy has value: %s", check.Field, check.Value)
@@ -44,7 +44,7 @@ func compareStrings(rawPayload string, check *v1.Check) *v1.CheckResult {
 	return CreateCheckResult(true, err)
 }
 
-func compareNumbers(rawPayload string, check *v1.Check) *v1.CheckResult {
+func compareNumbers(payload string, check *v1.Check) *v1.CheckResult {
 
 	valN, err := getNumber(check.Value)
 	if err != nil {
@@ -54,7 +54,7 @@ func compareNumbers(rawPayload string, check *v1.Check) *v1.CheckResult {
 		)
 	}
 
-	values := getValues(check.Field, rawPayload)
+	values := getValues(check.Field, payload)
 	for _, v := range values {
 		payloadN, err := getNumber(getStringValue(v))
 		if err != nil {

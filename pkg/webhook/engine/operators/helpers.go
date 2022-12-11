@@ -42,13 +42,6 @@ func getStringValue(v gjson.Result) string {
 	return fmt.Sprintf("%v", v)
 }
 
-func NewCheckResult() *v1.CheckResult {
-	return &v1.CheckResult{
-		Result:  false,
-		Message: "",
-	}
-}
-
 func CreateCheckResult(res bool, msg string) *v1.CheckResult {
 	return &v1.CheckResult{
 		Result:  res,

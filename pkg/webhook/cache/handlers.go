@@ -1,28 +1,11 @@
 package cache
 
 import (
-	"strings"
-
 	v1 "github.com/RedLabsPlatform/kube-shield/pkg/apis/v1"
 	"github.com/sirupsen/logrus"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
 )
-
-// Extract API Group & Version from apiVersion field
-// the core api group, which is usually equal to "" (empty) is set as "_core" here
-func getGV(info string) (Group, Version) {
-
-	gv := strings.Split(info, "/")
-	group := "_core"
-	version := info
-	if len(gv) > 1 {
-		group = gv[0]
-		version = gv[1]
-	}
-
-	return Group(group), Version(version)
-}
 
 // ** Policies scope
 
@@ -42,11 +25,11 @@ func (c *Controller) onPolicyUpdate(oldObj interface{}, newObj interface{}) {
 	// lock index, remove old policies and add new ones
 	c.CacheIndex.Lock()
 	for _, res := range oldPolicy.Spec.ApplyOn {
-		group, version := getGV(res.APIVersion)
+		group, version := c.GetGV(res.APIVersion)
 		c.CacheIndex.Delete(Namespace(oldPolicy.Namespace), group, version, Kind(res.Kind), PolicyName(oldPolicy.Name))
 	}
 	for _, res := range newPolicy.Spec.ApplyOn {
-		group, version := getGV(res.APIVersion)
+		group, version := c.GetGV(res.APIVersion)
 		c.CacheIndex.Add(Namespace(newPolicy.Namespace), group, version, Kind(res.Kind), PolicyName(newPolicy.Name))
 	}
 	c.CacheIndex.Unlock()
@@ -63,7 +46,7 @@ func (c *Controller) onPolicyAdd(obj interface{}) {
 	}
 
 	for _, res := range policy.Spec.ApplyOn {
-		group, version := getGV(res.APIVersion)
+		group, version := c.GetGV(res.APIVersion)
 		c.CacheIndex.Lock()
 		c.CacheIndex.Add(Namespace(policy.Namespace), group, version, Kind(res.Kind), PolicyName(policy.Name))
 		c.CacheIndex.Unlock()
@@ -80,7 +63,7 @@ func (c *Controller) onPolicyDelete(obj interface{}) {
 	}
 
 	for _, res := range policy.Spec.ApplyOn {
-		group, version := getGV(res.APIVersion)
+		group, version := c.GetGV(res.APIVersion)
 		c.CacheIndex.Lock()
 		c.CacheIndex.Delete(Namespace(policy.Namespace), group, version, Kind(res.Kind), PolicyName(policy.Name))
 		c.CacheIndex.Unlock()
@@ -105,11 +88,11 @@ func (c *Controller) onClusterPolicyUpdate(oldObj interface{}, newObj interface{
 	// lock index, remove old policies and add new ones
 	c.CacheIndex.Lock()
 	for _, res := range oldPolicy.Spec.ApplyOn {
-		group, version := getGV(res.APIVersion)
+		group, version := c.GetGV(res.APIVersion)
 		c.CacheIndex.Delete(Namespace("_ClusterScope"), group, version, Kind(res.Kind), PolicyName(oldPolicy.Name))
 	}
 	for _, res := range newPolicy.Spec.ApplyOn {
-		group, version := getGV(res.APIVersion)
+		group, version := c.GetGV(res.APIVersion)
 		c.CacheIndex.Add(Namespace("_ClusterScope"), group, version, Kind(res.Kind), PolicyName(newPolicy.Name))
 	}
 	c.CacheIndex.Unlock()
@@ -125,7 +108,7 @@ func (c *Controller) onClusterPolicyAdd(obj interface{}) {
 	}
 
 	for _, res := range clusterpolicy.Spec.ApplyOn {
-		group, version := getGV(res.APIVersion)
+		group, version := c.GetGV(res.APIVersion)
 		c.CacheIndex.Lock()
 		c.CacheIndex.Add(Namespace("_ClusterScope"), group, version, Kind(res.Kind), PolicyName(clusterpolicy.Name))
 		c.CacheIndex.Unlock()
@@ -143,7 +126,7 @@ func (c *Controller) onClusterPolicyDelete(obj interface{}) {
 	}
 
 	for _, res := range clusterpolicy.Spec.ApplyOn {
-		group, version := getGV(res.APIVersion)
+		group, version := c.GetGV(res.APIVersion)
 		c.CacheIndex.Lock()
 		c.CacheIndex.Delete(Namespace("_ClusterScope"), group, version, Kind(res.Kind), PolicyName(clusterpolicy.Name))
 		c.CacheIndex.Unlock()

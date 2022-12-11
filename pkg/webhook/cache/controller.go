@@ -1,6 +1,7 @@
 package cache
 
 import (
+	"strings"
 	"time"
 
 	v1 "github.com/RedLabsPlatform/kube-shield/pkg/apis/v1"
@@ -62,4 +63,19 @@ func (c *Controller) Run(polStopCh <-chan struct{}, clusterPolStopCh <-chan stru
 			logrus.Fatalf("namespace policy informer failed %v", err)
 		}
 	}
+}
+
+// Extract API Group & Version from apiVersion field
+// the core api group, which is usually equal to "" (empty) is set as "_core" here
+func (c *Controller) GetGV(info string) (Group, Version) {
+
+	gv := strings.Split(info, "/")
+	group := "_core"
+	version := info
+	if len(gv) > 1 {
+		group = gv[0]
+		version = gv[1]
+	}
+
+	return Group(group), Version(version)
 }
