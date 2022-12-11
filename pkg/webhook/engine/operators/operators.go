@@ -25,10 +25,20 @@ func compareStrings(rawPayload string, check *v1.Check) *v1.CheckResult {
 
 	for _, v := range values {
 		val := getStringValue(v)
-		if val != check.Value {
-			err := fmt.Sprintf("value '%s' is not equal to policy defined value: '%s'", val, check.Value)
-			return CreateCheckResult(false, err)
+		if check.Operator == EQUAL {
+			if val != check.Value {
+				err := fmt.Sprintf("%s: value '%s' is not equal to policy defined value: '%s'", check.Operator, val, check.Value)
+				return CreateCheckResult(false, err)
+			}
 		}
+
+		if check.Operator == NOTEQUAL {
+			if val == check.Value {
+				err := fmt.Sprintf("%s: value '%s' is equal to policy defined value: '%s'", check.Operator, val, check.Value)
+				return CreateCheckResult(false, err)
+			}
+		}
+
 	}
 
 	return CreateCheckResult(true, err)
@@ -57,7 +67,7 @@ func compareNumbers(rawPayload string, check *v1.Check) *v1.CheckResult {
 			if payloadN <= valN {
 				return CreateCheckResult(
 					false,
-					"retrieved value '%d' is lower than policy value '%d'",
+					fmt.Sprintf("%s: retrieved value '%v' is lower than policy value '%v'", check.Operator, payloadN, check.Value),
 				)
 			}
 		}
@@ -66,7 +76,7 @@ func compareNumbers(rawPayload string, check *v1.Check) *v1.CheckResult {
 			if payloadN >= valN {
 				return CreateCheckResult(
 					false,
-					"retrieved value '%d' is lower than policy value '%d'",
+					fmt.Sprintf("%s: retrieved value '%v' is greater than policy value '%v'", check.Operator, payloadN, check.Value),
 				)
 			}
 		}
