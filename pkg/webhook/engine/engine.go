@@ -7,7 +7,7 @@ import (
 	admissionv1 "k8s.io/api/admission/v1"
 )
 
-func (e *Engine) Load(payload *admissionv1.AdmissionReview) {
+func (e *Engine) Run(payload *admissionv1.AdmissionReview) {
 
 	//Policies map[Namespace]map[Group]map[Version]map[Kind][]PolicyName
 

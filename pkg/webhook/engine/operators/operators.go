@@ -16,7 +16,7 @@ const (
 func compareStrings(payload string, check *v1.Check) *v1.CheckResult {
 
 	var err string
-	payloadValues := getValues(check.Field, payload)
+	payloadValues := getPayloadValues(check.Field, payload)
 
 	if len(payloadValues) < 1 && check.Value != "" {
 		err = fmt.Sprintf("field: %s returned an empty value, policy has value: %s", check.Field, check.Value)
@@ -54,7 +54,7 @@ func compareNumbers(payload string, check *v1.Check) *v1.CheckResult {
 		)
 	}
 
-	values := getValues(check.Field, payload)
+	values := getPayloadValues(check.Field, payload)
 	for _, v := range values {
 		payloadN, err := getNumber(getStringValue(v))
 		if err != nil {

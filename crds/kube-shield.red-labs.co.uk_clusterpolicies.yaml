@@ -72,7 +72,7 @@ spec:
                             - Count
                             type: string
                           value:
-                            type: string
+                            x-kubernetes-preserve-unknown-fields: true
                         required:
                         - field
                         - operator

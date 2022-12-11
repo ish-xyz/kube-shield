@@ -65,7 +65,7 @@ type Check struct {
 	Operator string `json:"operator"`
 
 	// +kubebuilder:validation:Required
-	Value string `json:"value"`
+	Value interface{} `json:"value"`
 }
 
 type CheckResult struct {
