@@ -60,7 +60,7 @@ spec:
                       items:
                         properties:
                           field:
-                            pattern: ^\$_\.*$
+                            pattern: ^\$_\..*$
                             type: string
                           operator:
                             enum:
@@ -81,7 +81,6 @@ spec:
                       maxItems: 500
                       minItems: 1
                       type: array
-                      uniqueItems: true
                     name:
                       pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
                       type: string

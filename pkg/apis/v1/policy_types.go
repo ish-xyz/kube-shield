@@ -36,7 +36,6 @@ type Rule struct {
 	// +kubebuilder:validation:Required
 	Name string `json:"name"`
 	// +kubebuilder:validation:Required
-	// +kubebuilder:validation:UniqueItems=true
 	// +kubebuilder:validation:MaxItems=500
 	// +kubebuilder:validation:MinItems=1
 	Checks []Check `json:"checks"`
@@ -59,7 +58,7 @@ type ResourceAddress struct {
 
 type Check struct {
 	// +kubebuilder:validation:Required
-	// +kubebuilder:validation:Pattern=^\$_\.*$
+	// +kubebuilder:validation:Pattern=^\$_\..*$
 	Field string `json:"field"`
 	// +kubebuilder:validation:Required
 	// +kubebuilder:validation:Enum=GreaterThan;LowerThan;Equal;NotEqual;Regex;Count

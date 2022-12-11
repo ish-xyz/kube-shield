@@ -10,24 +10,11 @@ spec:
   defaultBehaviour: IfMatchDeny
   rules:
   - name: rule-name
-    data:
-    - key: $input.metadata.namespace
+    checks:
+    - field: $_.input.metadata.namespace
       operator: Regex
-      value: ^(kube-system|default)$
+      value: 1
     # AND
-    - key: $input.spec.containers[_].resources.limits.memory
-      operator: NotEqual
-      value: $input.spec.container[_].resources.requests.memory
-  # OR
-  - name: second-rule-name
-    data:
-    # - field: $_.metadata.namespace
-    #   regex: ^(kube-system|default)
- 
-    - key: $input.metadata.namespace
-      operator: Regex
-      value: ^(kube-system|default)$
-    # AND
-    - key: $input.spec.containers[_].resources.limits.memory
-      operator: NotEqual
-      value: $input.spec.container[_].resources.requests.memory
+    # - field: $_.input.spec.containers[_].resources.limits.memory
+    #   operator: NotEqual
+    #   value: $input.spec.container[_].resources.requests.memory

@@ -16,14 +16,14 @@ const (
 func compareStrings(payload string, check *v1.Check) *v1.CheckResult {
 
 	var err string
-	values := getValues(check.Field, payload)
+	payloadValues := getValues(check.Field, payload)
 
-	if len(values) < 1 && check.Value != "" {
+	if len(payloadValues) < 1 && check.Value != "" {
 		err = fmt.Sprintf("field: %s returned an empty value, policy has value: %s", check.Field, check.Value)
 		return CreateCheckResult(false, err)
 	}
 
-	for _, v := range values {
+	for _, v := range payloadValues {
 		val := getStringValue(v)
 		if check.Operator == EQUAL {
 			if val != check.Value {
