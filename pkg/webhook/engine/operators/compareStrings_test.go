@@ -43,7 +43,7 @@ func TestEqualTypeMismatchBool(t *testing.T) {
 	check := &v1.Check{
 		Field:    "$_.my.data",
 		Operator: "Equal",
-		Value:    "false",
+		Value:    false,
 	}
 
 	res := compareStrings(payload, check)
@@ -58,7 +58,7 @@ func TestEqualTypeMismatchInt(t *testing.T) {
 	check := &v1.Check{
 		Field:    "$_.my.data",
 		Operator: "Equal",
-		Value:    "1",
+		Value:    1,
 	}
 
 	res := compareStrings(payload, check)

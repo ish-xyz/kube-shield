@@ -15,34 +15,42 @@ const (
 
 func compareStrings(payload string, check *v1.Check) *v1.CheckResult {
 
-	var err string
+	var msg string
 	payloadValues := getPayloadValues(check.Field, payload)
 
-	if len(payloadValues) < 1 && check.Value != "" {
-		err = fmt.Sprintf("field: %s returned an empty value, policy has value: %s", check.Field, check.Value)
-		return CreateCheckResult(false, err)
+	if len(payloadValues) < 1 {
+
+		msg = fmt.Sprintf("%s: field: %s returned an empty value, policy has value: %s", check.Operator, check.Field, check.Value)
+
+		if check.Value != "" && check.Operator == EQUAL {
+			return CreateCheckResult(false, msg)
+		}
+		if check.Value == "" && check.Operator == NOTEQUAL {
+			return CreateCheckResult(false, msg)
+		}
+
 	}
 
 	for _, v := range payloadValues {
 
 		val := getTypedValue(v)
+		msg := fmt.Sprintf("%s: retrieved value '%s' policy defined value: '%s'", check.Operator, val, check.Value)
+
 		if check.Operator == EQUAL {
 			if val != check.Value {
-				err := fmt.Sprintf("%s: value '%s' is not equal to policy defined value: '%s'", check.Operator, val, check.Value)
-				return CreateCheckResult(false, err)
+				return CreateCheckResult(false, msg)
 			}
 		}
 
 		if check.Operator == NOTEQUAL {
 			if val == check.Value {
-				err := fmt.Sprintf("%s: value '%s' is equal to policy defined value: '%s'", check.Operator, val, check.Value)
-				return CreateCheckResult(false, err)
+				return CreateCheckResult(false, msg)
 			}
 		}
 
 	}
 
-	return CreateCheckResult(true, err)
+	return CreateCheckResult(true, "")
 }
 
 func compareNumbers(payload string, check *v1.Check) *v1.CheckResult {
