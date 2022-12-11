@@ -12,9 +12,7 @@ func getTypedValue(v gjson.Result) interface{} {
 	case "String":
 		return v.Str
 	case "Number":
-		if isInt(v.Num) {
-			return int(v.Num)
-		}
+		// always returns float
 		return v.Num
 	case "True":
 		return true
@@ -25,10 +23,6 @@ func getTypedValue(v gjson.Result) interface{} {
 	default:
 		return v.Raw
 	}
-}
-
-func isInt(v float64) bool {
-	return v == float64(int(v))
 }
 
 func getPayloadValues(address string, jsonData string) []gjson.Result {

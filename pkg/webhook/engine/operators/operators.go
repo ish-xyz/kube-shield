@@ -24,7 +24,8 @@ func compareStrings(payload string, check *v1.Check) *v1.CheckResult {
 	}
 
 	for _, v := range payloadValues {
-		val := getStringValue(v)
+
+		val := getTypedValue(v)
 		if check.Operator == EQUAL {
 			if val != check.Value {
 				err := fmt.Sprintf("%s: value '%s' is not equal to policy defined value: '%s'", check.Operator, val, check.Value)
@@ -46,25 +47,12 @@ func compareStrings(payload string, check *v1.Check) *v1.CheckResult {
 
 func compareNumbers(payload string, check *v1.Check) *v1.CheckResult {
 
-	valN, err := getNumber(check.Value)
-	if err != nil {
-		return CreateCheckResult(
-			false,
-			fmt.Sprintf("failed to convert number '%s': '%v'", check.Value, err),
-		)
-	}
-
 	values := getPayloadValues(check.Field, payload)
 	for _, v := range values {
-		payloadN, err := getNumber(getStringValue(v))
-		if err != nil {
-			return CreateCheckResult(
-				false,
-				fmt.Sprintf("failed to convert number '%s': '%v'", getStringValue(v), err),
-			)
-		}
+		// TODO: fix the code below
+		val := getTypedValue(v)
 		if check.Operator == GREATER {
-			if payloadN <= valN {
+			if val.(float64) <= check.Value {
 				return CreateCheckResult(
 					false,
 					fmt.Sprintf("%s: retrieved value '%v' is lower than policy value '%v'", check.Operator, payloadN, check.Value),
@@ -73,7 +61,7 @@ func compareNumbers(payload string, check *v1.Check) *v1.CheckResult {
 		}
 
 		if check.Operator == LOWER {
-			if payloadN >= valN {
+			if val.(float64) >= check.Value {
 				return CreateCheckResult(
 					false,
 					fmt.Sprintf("%s: retrieved value '%v' is greater than policy value '%v'", check.Operator, payloadN, check.Value),
