@@ -13,37 +13,31 @@ const (
 	NOTEQUAL = "NotEqual"
 )
 
-func compareStrings(payload string, check *v1.Check) *v1.CheckResult {
+func compare(payload string, check *v1.Check) *v1.CheckResult {
 
-	var msg string
+	msg := ""
 	payloadValues := getPayloadValues(check.Field, payload)
+	checkValues := getPolicyValue(check.Value, payload)
 
-	if len(payloadValues) < 1 {
-
+	// if there are no retrieved values and then the check is '== $any' or '!= nil', then fail
+	if (len(payloadValues) == 0) && (checkValues != "" && check.Operator == EQUAL) || (checkValues == "" && check.Operator == NOTEQUAL) {
 		msg = fmt.Sprintf("%s: field: %s returned an empty value, policy has value: %s", check.Operator, check.Field, check.Value)
-
-		if check.Value != "" && check.Operator == EQUAL {
-			return CreateCheckResult(false, msg)
-		}
-		if check.Value == "" && check.Operator == NOTEQUAL {
-			return CreateCheckResult(false, msg)
-		}
-
+		return CreateCheckResult(false, msg)
 	}
 
 	for _, v := range payloadValues {
 
-		val := getTypedValue(v)
-		msg := fmt.Sprintf("%s: retrieved value '%s' policy defined value: '%s'", check.Operator, val, check.Value)
+		val := getTypedPayloadValue(v)
+		msg := fmt.Sprintf("%s: retrieved value '%s' policy defined value: '%s'", check.Operator, val, checkValues)
 
 		if check.Operator == EQUAL {
-			if val != check.Value {
+			if val != checkValues {
 				return CreateCheckResult(false, msg)
 			}
 		}
 
 		if check.Operator == NOTEQUAL {
-			if val == check.Value {
+			if val == checkValues {
 				return CreateCheckResult(false, msg)
 			}
 		}
@@ -54,44 +48,5 @@ func compareStrings(payload string, check *v1.Check) *v1.CheckResult {
 }
 
 func compareNumbers(payload string, check *v1.Check) *v1.CheckResult {
-
-	checkVal, err := getFloat(check.Value)
-	if err != nil {
-		return CreateCheckResult(
-			false,
-			fmt.Sprintf("%s: invalid check.Value '%v' is not a number", check.Operator, check.Value),
-		)
-	}
-
-	values := getPayloadValues(check.Field, payload)
-	for _, v := range values {
-
-		payloadVal, err := getFloat(getTypedValue(v))
-		if err != nil {
-			return CreateCheckResult(
-				false,
-				fmt.Sprintf("%s: invalid value retrieved '%v' is not a number", check.Operator, v),
-			)
-		}
-
-		if check.Operator == GREATER {
-			if payloadVal <= checkVal {
-				return CreateCheckResult(
-					false,
-					fmt.Sprintf("%s: retrieved value '%v' is lower than policy value '%v'", check.Operator, payloadVal, checkVal),
-				)
-			}
-		}
-
-		if check.Operator == LOWER {
-			if payloadVal >= checkVal {
-				return CreateCheckResult(
-					false,
-					fmt.Sprintf("%s: retrieved value '%v' is greater than policy value '%v'", check.Operator, payloadVal, checkVal),
-				)
-			}
-		}
-	}
-
-	return CreateCheckResult(true, "")
+	return nil
 }

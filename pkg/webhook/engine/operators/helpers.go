@@ -8,20 +8,14 @@ import (
 	"github.com/tidwall/gjson"
 )
 
-func getFloat(v interface{}) (float64, error) {
-	switch v.(type) {
-	case float64:
-		return v.(float64), nil
-	}
-	return 0, fmt.Errorf("invalid float64: %v", v)
-}
-
-func getTypedValue(v gjson.Result) interface{} {
+func getTypedPayloadValue(v gjson.Result) interface{} {
 	switch v.Type.String() {
 	case "String":
 		return v.Str
 	case "Number":
-		// always returns float
+		if float64(int(v.Num)) == v.Num {
+			return int(v.Num)
+		}
 		return v.Num
 	case "True":
 		return true
@@ -37,7 +31,17 @@ func getTypedValue(v gjson.Result) interface{} {
 func getPayloadValues(address string, jsonData string) []gjson.Result {
 	address = strings.TrimPrefix(address, "$_.")
 	return gjson.Get(jsonData, address).Array()
+}
 
+func getPolicyValue(v interface{}, payload string) interface{} {
+	if strings.HasPrefix(fmt.Sprintf("%v", v), "$_.") {
+		payloadValues := getPayloadValues(v.(string), payload)
+		if len(payload) > 0 {
+			return getTypedPayloadValue(payloadValues[0])
+		}
+		return ""
+	}
+	return v
 }
 
 func CreateCheckResult(res bool, msg string) *v1.CheckResult {
