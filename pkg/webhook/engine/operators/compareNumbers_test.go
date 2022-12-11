@@ -32,12 +32,69 @@ func TestCompareNumbers(t *testing.T) {
 	res2 := compareNumbers(payload, check2)
 	res3 := compareNumbers(payload, check3)
 
-	assert.Equal(t, res1.Result, false)
-	assert.Equal(t, res2.Result, false)
-	assert.Equal(t, res3.Result, true)
+	assert.False(t, res1.Result)
+	assert.False(t, res2.Result)
+	assert.True(t, res3.Result)
 }
 
-// test invalid numbers e.g.: "13fa"
-// test very big numbers e.g.: 10000000000000000
-// test negative numbers
+func TestBigNumbers(t *testing.T) {
+	check1 := &v1.Check{
+		Field:    "$_.value1",
+		Operator: "LowerThan",
+		Value:    "10000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+	}
+
+	payload := `{"value1": 99, "value2": 1.10, "value3": 1.12}`
+
+	res1 := compareNumbers(payload, check1)
+
+	assert.Equal(t, res1.Message, "")
+	assert.True(t, res1.Result)
+}
+
+func TestInvalidNumbers(t *testing.T) {
+	check1 := &v1.Check{
+		Field:    "$_.value1",
+		Operator: "LowerThan",
+		Value:    "12FA",
+	}
+
+	payload := `{"value1": 99, "value2": 1.10, "value3": 1.12}`
+
+	res1 := compareNumbers(payload, check1)
+
+	assert.NotEqual(t, res1.Message, "")
+	assert.False(t, res1.Result)
+}
+
+func TestNegativeNumbers(t *testing.T) {
+	check1 := &v1.Check{
+		Field:    "$_.value1",
+		Operator: "GreaterThan",
+		Value:    "-10000000",
+	}
+
+	payload := `{"value1": 99}`
+
+	res1 := compareNumbers(payload, check1)
+
+	assert.Equal(t, res1.Message, "")
+	assert.True(t, res1.Result)
+}
+
+func TestZeroNum(t *testing.T) {
+	check1 := &v1.Check{
+		Field:    "$_.value1",
+		Operator: "GreaterThan",
+		Value:    "0",
+	}
+
+	payload := `{"value1": 99}`
+
+	res1 := compareNumbers(payload, check1)
+
+	assert.Equal(t, res1.Message, "")
+	assert.True(t, res1.Result)
+}
+
 // test zero

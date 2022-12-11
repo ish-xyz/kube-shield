@@ -49,7 +49,7 @@ func compareNumbers(rawPayload string, check *v1.Check) *v1.CheckResult {
 	valN, err := getNumber(check.Value)
 	if err != nil {
 		return CreateCheckResult(
-			true,
+			false,
 			fmt.Sprintf("failed to convert number '%s': '%v'", check.Value, err),
 		)
 	}
@@ -59,7 +59,7 @@ func compareNumbers(rawPayload string, check *v1.Check) *v1.CheckResult {
 		payloadN, err := getNumber(getStringValue(v))
 		if err != nil {
 			return CreateCheckResult(
-				true,
+				false,
 				fmt.Sprintf("failed to convert number '%s': '%v'", getStringValue(v), err),
 			)
 		}

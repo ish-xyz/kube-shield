@@ -18,7 +18,7 @@ func TestEqual(t *testing.T) {
 
 	res := compareStrings(payload, check)
 
-	assert.Equal(t, res.Error, "")
+	assert.Equal(t, res.Message, "")
 	assert.Equal(t, res.Result, true)
 }
 
@@ -33,7 +33,7 @@ func TestEqualFailed(t *testing.T) {
 
 	res := compareStrings(payload, check)
 
-	assert.NotEqual(t, res.Error, "")
+	assert.NotEqual(t, res.Message, "")
 	assert.Equal(t, res.Result, false)
 }
 
@@ -48,7 +48,7 @@ func TestEqualTypeMismatchBool(t *testing.T) {
 
 	res := compareStrings(payload, check)
 
-	assert.Equal(t, res.Error, "")
+	assert.Equal(t, res.Message, "")
 	assert.Equal(t, res.Result, true)
 }
 
@@ -63,7 +63,7 @@ func TestEqualTypeMismatchInt(t *testing.T) {
 
 	res := compareStrings(payload, check)
 
-	assert.Equal(t, res.Error, "")
+	assert.Equal(t, res.Message, "")
 	assert.Equal(t, res.Result, true)
 }
 
@@ -78,6 +78,6 @@ func TestEqualTypeMismatchFloat(t *testing.T) {
 
 	res := compareStrings(payload, check)
 
-	assert.Equal(t, res.Error, "")
+	assert.Equal(t, res.Message, "")
 	assert.Equal(t, res.Result, true)
 }
