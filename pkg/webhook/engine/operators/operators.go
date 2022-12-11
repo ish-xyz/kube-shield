@@ -47,24 +47,39 @@ func compareStrings(payload string, check *v1.Check) *v1.CheckResult {
 
 func compareNumbers(payload string, check *v1.Check) *v1.CheckResult {
 
+	checkVal, err := getFloat(check.Value)
+	if err != nil {
+		return CreateCheckResult(
+			false,
+			fmt.Sprintf("%s: invalid check.Value '%v' is not a number", check.Operator, check.Value),
+		)
+	}
+
 	values := getPayloadValues(check.Field, payload)
 	for _, v := range values {
-		// TODO: fix the code below
-		val := getTypedValue(v)
+
+		payloadVal, err := getFloat(getTypedValue(v))
+		if err != nil {
+			return CreateCheckResult(
+				false,
+				fmt.Sprintf("%s: invalid value retrieved '%v' is not a number", check.Operator, v),
+			)
+		}
+
 		if check.Operator == GREATER {
-			if val.(float64) <= check.Value {
+			if payloadVal <= checkVal {
 				return CreateCheckResult(
 					false,
-					fmt.Sprintf("%s: retrieved value '%v' is lower than policy value '%v'", check.Operator, payloadN, check.Value),
+					fmt.Sprintf("%s: retrieved value '%v' is lower than policy value '%v'", check.Operator, payloadVal, checkVal),
 				)
 			}
 		}
 
 		if check.Operator == LOWER {
-			if val.(float64) >= check.Value {
+			if payloadVal >= checkVal {
 				return CreateCheckResult(
 					false,
-					fmt.Sprintf("%s: retrieved value '%v' is greater than policy value '%v'", check.Operator, payloadN, check.Value),
+					fmt.Sprintf("%s: retrieved value '%v' is greater than policy value '%v'", check.Operator, payloadVal, checkVal),
 				)
 			}
 		}
