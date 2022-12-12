@@ -15,15 +15,12 @@ type Server struct {
 	Engine *engine.Engine
 }
 
-func (s *Server) Start() error {
-
-	fmt.Printf("+%v", s)
+func (s *Server) Start() {
 
 	http.HandleFunc("/validate", s.ServeValidate)
 
 	// Run tls server
-	err := http.ListenAndServeTLS(":8000", "/tmp/certs/server.crt", "/tmp/certs/server.key", nil)
-	return err
+	logrus.Fatal(http.ListenAndServeTLS(":8000", "/tmp/certs/server.crt", "/tmp/certs/server.key", nil))
 }
 
 // ServeValidatePods validates an admission request and then writes an admission review to `w`

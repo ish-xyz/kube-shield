@@ -71,7 +71,8 @@ spec:
                             - Regex
                             - Count
                             type: string
-                          value: {}
+                          value:
+                            x-kubernetes-preserve-unknown-fields: true
                         required:
                         - field
                         - operator
