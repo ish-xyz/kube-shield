@@ -1,0 +1,49 @@
+apiVersion: admissionregistration.k8s.io/v1
+kind: ValidatingWebhookConfiguration
+metadata:
+  name: "webhook-test.default.svc"
+webhooks:
+- name: "webhook-test.default.svc"
+  rules:
+  - apiGroups:   [""]
+    apiVersions: ["*"]
+    operations:  ["*"]
+    resources:   ["*"]
+    scope:       "*"
+  clientConfig:
+    service:
+      name: webhook-test
+      namespace: default
+      path: /webhook
+    caBundle: "LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUMrekNDQWVPZ0F3SUJBZ0lCQURBTkJna3Foa2lHOXcwQkFRc0ZBREFmTVIwd0d3WURWUVFERXhSelpXeG0KTFhOcFoyNWxaQzFyT0hNdFkyVnlkREFlRncweU1qRXhNalV5TXpJMU5URmFGdzB6TWpFeE1qSXlNekkxTlRGYQpNQjh4SFRBYkJnTlZCQU1URkhObGJHWXRjMmxuYm1Wa0xXczRjeTFqWlhKME1JSUJJakFOQmdrcWhraUc5dzBCCkFRRUZBQU9DQVE4QU1JSUJDZ0tDQVFFQXZLOTJYeVM2YWhoMlUxa2M0Z1BpK2dUdDJUTHQvTng0UERNSkR4T0QKNUw0LzdnYy92MzcvTStEaGZ5U1hkN2tQMUNVWVVVdGZkSnNVUE9NMXRDU0FIRUEzZ0J3VjcyUGxCa1ZSVnpxUwo4bVF3SVBQZ3EwMS93WUFmMDFOT1hZYTlobElPVjRLWTNYdXVITDVjd1R0ZjA1QkdzcGlid3RiVXRMcDArZHpMCmVUOUwwamk1TkRHYlRvb2dSVGV3ek1EaFVsbkJqU3RLeGVtbHhURmlvTEswVGNWcWJzTUpWYXNiREhDaFpTQXcKYzR4Rzk1R1kxRXo0Y2NVQ3lXTkhmZzNiTC9KcXFPeGQzZFRXVkdCSWtqdnB3Z3dHUG0vc3p1S3NqVHVoVm4rLwpwVVc0b05FNlQvRVo5bXArWERZczBGWWZTMEpoSkxOUFcxODVlVmhnZWRIb1FRSURBUUFCbzBJd1FEQU9CZ05WCkhROEJBZjhFQkFNQ0FxUXdEd1lEVlIwVEFRSC9CQVV3QXdFQi96QWRCZ05WSFE0RUZnUVUzNzFOQURHeVZrOWMKUXVuR2lBZkNUUnROWXVFd0RRWUpLb1pJaHZjTkFRRUxCUUFEZ2dFQkFJNkY5ekNQSEphcGtmNytpSGl4bndIdQpuSnoxSm1ZYjY4eXF1K2VWT0E1ckxuZ2dPbXFkQTJ3ZjIxRDhHSXZONmpWWnVqNUpnU0hoTHpWS00zY3kvTm5yCjNaaFpMQlJYa1VBOVR6U0I1bWRkQjVOMlQ5TG5UOFRlVkpjZVJjM1JtZk5Ka2pmcEhjRE52bldKaXUrL25lejUKT3c2cWVsZjM5T3dlZ05zcW1DZXRHZWFVcmJFcG5HVXk2SEN6SWtRODFaOXZwME9TR2hqWE1zVHpQWXp0QWFVVAp1dFFYSzZLQ21BOXVFVUROQm9Tbkg1N1FYZDU2blF3azR0WmhtT05wVFpIdk5WTVUyUm9zQzdpQjN2YU9qSTBRCjcvcWlJZHNsYllsUCtLOVhQUGpmR1RuK3c1Qm9NMUVqUlRhbVBFNVZrM1pHUVpBaXhIcU9qWllMUmlXL0oxWT0KLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQo="
+  admissionReviewVersions: ["v1"]
+  failurePolicy: Ignore
+  sideEffects: None
+  timeoutSeconds: 5
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: webhook-test
+  namespace: default
+  labels:
+    app: webhook-test
+spec:
+  containers:
+  - name: webhook-container
+    imagePullPolicy: Never
+    image: docker.io/library/test:12
+    ports:
+    - containerPort: 8000
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: webhook-test
+spec:
+  selector:
+    app: webhook-test
+  ports:
+    - protocol: TCP
+      port: 443
+      targetPort: 8000
