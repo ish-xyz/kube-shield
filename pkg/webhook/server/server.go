@@ -22,7 +22,7 @@ func (s *Server) Start() error {
 	http.HandleFunc("/validate", s.ServeValidate)
 
 	// Run tls server
-	err := http.ListenAndServeTLS(":8000", "/tmp/server.crt", "tmp/server.key", nil)
+	err := http.ListenAndServeTLS(":8000", "/tmp/certs/server.crt", "/tmp/certs/server.key", nil)
 	return err
 }
 
