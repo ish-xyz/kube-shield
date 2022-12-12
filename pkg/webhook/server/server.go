@@ -1,70 +1,49 @@
 package server
 
 import (
-	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
 
-	"github.com/RedLabsPlatform/kube-shield/pkg/config"
+	"github.com/RedLabsPlatform/kube-shield/pkg/webhook/engine"
 	"github.com/sirupsen/logrus"
 	admissionv1 "k8s.io/api/admission/v1"
 )
 
 type Server struct {
-	Http        *http.Server
-	WebhookPath string
-	Debug       bool
+	Engine *engine.Engine
 }
 
-func NewServer(cfg *config.Config) (*Server, error) {
-
-	cert, err := tls.LoadX509KeyPair(cfg.TLSCert, cfg.TLSKey)
-	if err != nil {
-		return nil, err
-	}
-
-	return &Server{
-		Http: &http.Server{
-			Addr: cfg.Address,
-			TLSConfig: &tls.Config{
-				Certificates: []tls.Certificate{cert},
-			},
-		},
-		WebhookPath: cfg.Path,
-		Debug:       cfg.Debug,
-	}, nil
-}
-
-func (s *Server) Run() error {
+func (s *Server) Start() error {
 
 	fmt.Printf("+%v", s)
 
-	http.HandleFunc("/validate", ServeValidate)
+	http.HandleFunc("/validate", s.ServeValidate)
 
 	// Run tls server
-	err := s.Http.ListenAndServeTLS("", "")
+	err := http.ListenAndServeTLS(":8000", "/tmp/server.crt", "tmp/server.key", nil)
 	return err
 }
 
 // ServeValidatePods validates an admission request and then writes an admission review to `w`
-func ServeValidate(w http.ResponseWriter, r *http.Request) {
+func (s *Server) ServeValidate(w http.ResponseWriter, r *http.Request) {
 	logger := logrus.WithField("uri", r.RequestURI)
 	logger.Debug("received validation request")
 
-	payload, err := parseRequest(*r)
+	payload, err := getAdmissionReview(*r)
 	if err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	logger.Warnln(payload)
+	s.Engine.Run(payload)
+	http.Error(w, err.Error(), http.StatusBadRequest)
 }
 
-// parseRequest extracts an AdmissionReview from an http.Request if possible
-func parseRequest(r http.Request) (*admissionv1.AdmissionReview, error) {
+// getAdmissionReview extracts an AdmissionReview from an http.Request if possible
+func getAdmissionReview(r http.Request) (*admissionv1.AdmissionReview, error) {
 
 	var a admissionv1.AdmissionReview
 

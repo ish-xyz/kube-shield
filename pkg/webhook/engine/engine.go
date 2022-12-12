@@ -17,9 +17,27 @@ func (e *Engine) Run(payload *admissionv1.AdmissionReview) {
 	kind := cache.Kind(payload.Kind)
 
 	e.Logger.Debugln("policies for payload")
-	e.Logger.Debugln(fmt.Println(index.Policies[ns][group][version][kind]))
+	store := e.CacheController.NamespaceInformer.GetStore()
+	for _, v := range index.Policies[ns][group][version][kind] {
+		fmt.Println(v)
+		obj, exists, err := store.GetByKey(string(v))
+		if err != nil {
+			e.Logger.Warnln("failed to get policy with name '%v', error: '%v'", v, err)
+		}
+		if !exists {
+			e.Logger.Warnln("object %v is cached in index but the actual resource doesn't exists", v)
+			continue
+		}
+		fmt.Println(obj)
+	}
+
 	/*
-		Load all cluster policies first from index
+		for each clusterpolicy
+			get policy object from cache
+			load into policy
+			for each check
+		for each policy
+			get policy object from cache
 		Load all namespaced policies
 	*/
 }

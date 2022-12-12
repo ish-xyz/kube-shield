@@ -1,8 +1,8 @@
 # Allowed operators: Equal, NotEqual, Regex, GreaterThan, LowerThan
 apiVersion: kube-shield.red-labs.co.uk/v1
-kind: Policy #or ClusterPolicy
+kind: Policy
 metadata:
-  name: some-random-policy
+  name: deny-pods-kube-system
 spec:
   applyOn:
     - apiVersion: v1
@@ -12,8 +12,9 @@ spec:
   - name: rule-name
     checks:
     - field: $_.input.metadata.namespace
-      operator: Regex
-      value: 1
+      operator: Equal
+      value: kube-system
+
     # AND
     # - field: $_.input.spec.containers[_].resources.limits.memory
     #   operator: NotEqual
