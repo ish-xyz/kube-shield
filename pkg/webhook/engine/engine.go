@@ -11,13 +11,13 @@ func (e *Engine) Run(payload *admissionv1.AdmissionReview) {
 
 	//Policies map[Namespace]map[Group]map[Version]map[Kind][]PolicyName
 
-	index := e.CacheController.CacheIndex.Policies
+	index := e.CacheController.CacheIndex
 	ns := cache.Namespace(payload.Request.Namespace)
 	group, version := e.CacheController.GetGV(payload.APIVersion)
 	kind := cache.Kind(payload.Kind)
 
 	e.Logger.Debugln("policies for payload")
-	e.Logger.Debugln(fmt.Println(index[ns][group][version][kind]))
+	e.Logger.Debugln(fmt.Println(index.Policies[ns][group][version][kind]))
 	/*
 		Load all cluster policies first from index
 		Load all namespaced policies

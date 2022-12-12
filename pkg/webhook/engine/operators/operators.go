@@ -30,23 +30,15 @@ func compare(payload string, check *v1.Check) *v1.CheckResult {
 		val := getTypedPayloadValue(v)
 		msg := fmt.Sprintf("%s: retrieved value '%s' policy defined value: '%s'", check.Operator, val, checkValues)
 
-		if check.Operator == EQUAL {
-			if val != checkValues {
-				return CreateCheckResult(false, msg)
-			}
+		if check.Operator == EQUAL && val != checkValues {
+			return CreateCheckResult(false, msg)
 		}
 
-		if check.Operator == NOTEQUAL {
-			if val == checkValues {
-				return CreateCheckResult(false, msg)
-			}
+		if check.Operator == NOTEQUAL && val == checkValues {
+			return CreateCheckResult(false, msg)
 		}
 
 	}
 
 	return CreateCheckResult(true, "")
-}
-
-func compareNumbers(payload string, check *v1.Check) *v1.CheckResult {
-	return nil
 }
