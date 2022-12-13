@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
+	"net"
 	"net/http"
 
 	"github.com/RedLabsPlatform/kube-shield/pkg/webhook/engine"
@@ -20,8 +22,16 @@ func (s *Server) Start() {
 	http.HandleFunc("/validate", s.ServeValidate)
 
 	// Run tls server
-	logrus.Infoln("serving requests on :8000")
-	logrus.Fatal(http.ListenAndServeTLS("0.0.0.0:8000", "./certs/server.crt", "./certs/server.key", nil))
+	addr := ":8000" //TODO: should be a parameter
+	logrus.Infoln("serving requests on" + addr)
+	// TODO: temporary for testing with minikube (it doesn't support tunneling over IPV6)
+	// logrus.Fatal(http.ListenAndServeTLS("0.0.0.0:8001", "./certs/server.crt", "./certs/server.key", nil))
+	l, err := net.Listen("tcp4", addr)
+	if err != nil {
+		log.Fatal(err)
+	}
+	logrus.Fatal(http.ServeTLS(l, nil, "./certs/server.crt", "./certs/server.key"))
+
 }
 
 // ServeValidatePods validates an admission request and then writes an admission review to `w`
