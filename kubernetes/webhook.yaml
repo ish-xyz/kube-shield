@@ -1,9 +1,9 @@
 apiVersion: admissionregistration.k8s.io/v1
 kind: ValidatingWebhookConfiguration
 metadata:
-  name: "kube-shield.default.svc"
+  name: "host.minikube.internal"
 webhooks:
-- name: "kube-shield.default.svc"
+- name: "host.minikube.internal"
   rules:
   - apiGroups:   [""]
     apiVersions: ["*"]
@@ -11,63 +11,9 @@ webhooks:
     resources:   ["*"]
     scope:       "*"
   clientConfig:
-    service:
-      name: kube-shield
-      namespace: default
-      path: /validate
-    caBundle: "LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUMrekNDQWVPZ0F3SUJBZ0lCQURBTkJna3Foa2lHOXcwQkFRc0ZBREFmTVIwd0d3WURWUVFERXhSelpXeG0KTFhOcFoyNWxaQzFyT0hNdFkyVnlkREFlRncweU1qRXhNalV5TXpJMU5URmFGdzB6TWpFeE1qSXlNekkxTlRGYQpNQjh4SFRBYkJnTlZCQU1URkhObGJHWXRjMmxuYm1Wa0xXczRjeTFqWlhKME1JSUJJakFOQmdrcWhraUc5dzBCCkFRRUZBQU9DQVE4QU1JSUJDZ0tDQVFFQXZLOTJYeVM2YWhoMlUxa2M0Z1BpK2dUdDJUTHQvTng0UERNSkR4T0QKNUw0LzdnYy92MzcvTStEaGZ5U1hkN2tQMUNVWVVVdGZkSnNVUE9NMXRDU0FIRUEzZ0J3VjcyUGxCa1ZSVnpxUwo4bVF3SVBQZ3EwMS93WUFmMDFOT1hZYTlobElPVjRLWTNYdXVITDVjd1R0ZjA1QkdzcGlid3RiVXRMcDArZHpMCmVUOUwwamk1TkRHYlRvb2dSVGV3ek1EaFVsbkJqU3RLeGVtbHhURmlvTEswVGNWcWJzTUpWYXNiREhDaFpTQXcKYzR4Rzk1R1kxRXo0Y2NVQ3lXTkhmZzNiTC9KcXFPeGQzZFRXVkdCSWtqdnB3Z3dHUG0vc3p1S3NqVHVoVm4rLwpwVVc0b05FNlQvRVo5bXArWERZczBGWWZTMEpoSkxOUFcxODVlVmhnZWRIb1FRSURBUUFCbzBJd1FEQU9CZ05WCkhROEJBZjhFQkFNQ0FxUXdEd1lEVlIwVEFRSC9CQVV3QXdFQi96QWRCZ05WSFE0RUZnUVUzNzFOQURHeVZrOWMKUXVuR2lBZkNUUnROWXVFd0RRWUpLb1pJaHZjTkFRRUxCUUFEZ2dFQkFJNkY5ekNQSEphcGtmNytpSGl4bndIdQpuSnoxSm1ZYjY4eXF1K2VWT0E1ckxuZ2dPbXFkQTJ3ZjIxRDhHSXZONmpWWnVqNUpnU0hoTHpWS00zY3kvTm5yCjNaaFpMQlJYa1VBOVR6U0I1bWRkQjVOMlQ5TG5UOFRlVkpjZVJjM1JtZk5Ka2pmcEhjRE52bldKaXUrL25lejUKT3c2cWVsZjM5T3dlZ05zcW1DZXRHZWFVcmJFcG5HVXk2SEN6SWtRODFaOXZwME9TR2hqWE1zVHpQWXp0QWFVVAp1dFFYSzZLQ21BOXVFVUROQm9Tbkg1N1FYZDU2blF3azR0WmhtT05wVFpIdk5WTVUyUm9zQzdpQjN2YU9qSTBRCjcvcWlJZHNsYllsUCtLOVhQUGpmR1RuK3c1Qm9NMUVqUlRhbVBFNVZrM1pHUVpBaXhIcU9qWllMUmlXL0oxWT0KLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQo="
+    url: "https://host.minikube.internal:8000/validate"
+    caBundle: "LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUMrekNDQWVPZ0F3SUJBZ0lCQURBTkJna3Foa2lHOXcwQkFRc0ZBREFmTVIwd0d3WURWUVFERXhSelpXeG0KTFhOcFoyNWxaQzFyT0hNdFkyVnlkREFlRncweU1qRXlNVE15TURJd016ZGFGdzB6TWpFeU1UQXlNREl3TXpkYQpNQjh4SFRBYkJnTlZCQU1URkhObGJHWXRjMmxuYm1Wa0xXczRjeTFqWlhKME1JSUJJakFOQmdrcWhraUc5dzBCCkFRRUZBQU9DQVE4QU1JSUJDZ0tDQVFFQXphOTFwUEZBMTJBTTNTa0V2SlY5ejBQd1lJcGZWZ2lsTnFWNncyR0UKTWhmMTVrZDJzS0RMTkVWVE5nY3R2MzVycmtNRjBqVk5BR1JFNHkvKzROdGthNHNKYmJpNFNkQUlsSEoxWktXTApEb1krZ0JQdzE2bmdmRXZkcUliUCt5c09pVjN1Q0RVNHB5NUplc29aS0VYVkowUGNNaTZwU0lrNS8vRjlzWHNFCjlhZkFqaUNiQU8rbnlVWVNTNXNvaUViTGdCWFdNc0pQOGZkRk1TdmZFTkpWSGUyWXNZWlhJczFmNUlQbnpRWEsKQUhpSjZ6V3B4UW1Wdmt4eU15ZFdTN3RnMTVVUlVFemRGK1oyZVZGSVRpRXpHSThoZjRSMm9NN3NodUlSNVQvSQpxZGhLY0duTkt1L0IzNUlDcUVuejFCTjdObEVyd3J5TE05OURyYXpEMXFZZVFRSURBUUFCbzBJd1FEQU9CZ05WCkhROEJBZjhFQkFNQ0FxUXdEd1lEVlIwVEFRSC9CQVV3QXdFQi96QWRCZ05WSFE0RUZnUVV1cjViR1F6ZldMV3EKMWNubml6L0tGUTgwcCtVd0RRWUpLb1pJaHZjTkFRRUxCUUFEZ2dFQkFJVWhjakt0NVROMjQ0REVJdlNYNmQ5bQp6RXJ2bURpc2kwdE0waE5RL2RxY1BMM1RKemw3K0tPS1N6UXdZRUphVHlxT05QRUNscnQvUWlqbVRGMzNFRXhlCmJjQktKMDRvdlU5eWRWdGtVRjB0T3cwWUl6dFoyT1Z4VWh2SzhPb2ZoR0tCNjA5Z0FDRGNZdVNQRDBscVIyUXcKNk1PZFlCNlUwSXQwTzliZUd3RWxkUUtCNDVVWUsxYXdXQUF5K2R3dUE5MUc2eC9HM3EzV1J0SmFiQTJGZS9rVgpucWdabEJOdmpkUzZiOCthempBN2I4NUR2ZGlubmxOWWFOR0phTERhUm9EZlpLa0REaVB6Rk9OUElJOHd6WWZvCjZDZnQ2VDBvT2d4aW14eDVmZ2JIUzVnenFtZ2VUSklsYmcwZVBmbWxjT3VObEtTdjFJV2RPS01INE15d2FTND0KLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQo="
   admissionReviewVersions: ["v1"]
-  failurePolicy: Ignore
+  failurePolicy: Fail
   sideEffects: None
   timeoutSeconds: 5
----
-apiVersion: v1
-kind: Pod
-metadata:
-  name: kube-shield
-  namespace: default
-  labels:
-    app: kube-shield
-spec:
-  containers:
-  - name: webhook-container
-    imagePullPolicy: Never
-    image: docker.io/library/kube-shield:1
-    ports:
-    - containerPort: 8000
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: kube-shield
-spec:
-  selector:
-    app: kube-shield
-  ports:
-    - protocol: TCP
-      port: 443
-      targetPort: 8000
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: Role
-metadata:
-  namespace: default
-  name: policy-reader
-rules:
-- apiGroups: ["kube-shield.red-labs.co.uk/v1"] # "" indicates the core API group
-  resources: ["policies"]
-  verbs: ["get", "watch", "list"]
----
-apiVersion: rbac.authorization.k8s.io/v1
-kind: RoleBinding
-metadata:
-  name: policy-reader-default-sa
-  namespace: default
-subjects:
-- kind: ServiceAccount
-  name: default
-  namespace: default
-roleRef:
-  kind: Role
-  name: policy-reader
-  apiGroup: rbac.authorization.k8s.io

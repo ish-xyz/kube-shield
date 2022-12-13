@@ -5,7 +5,6 @@ import (
 	"time"
 
 	v1 "github.com/RedLabsPlatform/kube-shield/pkg/apis/v1"
-	"github.com/sirupsen/logrus"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/client-go/dynamic"
@@ -40,11 +39,11 @@ func NewCacheController(clientset dynamic.Interface, c *CacheIndex) *Controller 
 func (c *Controller) Run(polStopCh <-chan struct{}, clusterPolStopCh <-chan struct{}) {
 
 	// Register handlers
-	c.ClusterInformer.AddEventHandler(kcache.ResourceEventHandlerFuncs{
-		AddFunc:    c.onClusterPolicyAdd,
-		UpdateFunc: c.onClusterPolicyUpdate,
-		DeleteFunc: c.onClusterPolicyDelete,
-	})
+	// c.ClusterInformer.AddEventHandler(kcache.ResourceEventHandlerFuncs{
+	// 	AddFunc:    c.onClusterPolicyAdd,
+	// 	UpdateFunc: c.onClusterPolicyUpdate,
+	// 	DeleteFunc: c.onClusterPolicyDelete,
+	// })
 
 	c.NamespaceInformer.AddEventHandler(kcache.ResourceEventHandlerFuncs{
 		AddFunc:    c.onPolicyAdd,
@@ -52,17 +51,17 @@ func (c *Controller) Run(polStopCh <-chan struct{}, clusterPolStopCh <-chan stru
 		DeleteFunc: c.onPolicyDelete,
 	})
 
-	go c.ClusterInformer.Run(clusterPolStopCh)
-	go c.NamespaceInformer.Run(polStopCh)
+	//go c.ClusterInformer.Run(clusterPolStopCh)
+	c.NamespaceInformer.Run(polStopCh)
 
-	for {
-		select {
-		case err := <-clusterPolStopCh:
-			logrus.Fatalf("cluster policy informer failed %v", err)
-		case err := <-polStopCh:
-			logrus.Fatalf("namespace policy informer failed %v", err)
-		}
-	}
+	//	for {
+	//		select {
+	//		case err := <-clusterPolStopCh:
+	//			logrus.Fatalf("cluster policy informer failed %v", err)
+	//		case err := <-polStopCh:
+	//			logrus.Fatalf("namespace policy informer failed %v", err)
+	//		}
+	//	}
 }
 
 // Extract API Group & Version from apiVersion field

@@ -20,13 +20,14 @@ func (s *Server) Start() {
 	http.HandleFunc("/validate", s.ServeValidate)
 
 	// Run tls server
-	logrus.Fatal(http.ListenAndServeTLS(":8000", "/tmp/certs/server.crt", "/tmp/certs/server.key", nil))
+	logrus.Infoln("serving requests on :8000")
+	logrus.Fatal(http.ListenAndServeTLS(":8000", "./certs/server.crt", "./certs/server.key", nil))
 }
 
 // ServeValidatePods validates an admission request and then writes an admission review to `w`
 func (s *Server) ServeValidate(w http.ResponseWriter, r *http.Request) {
 	logger := logrus.WithField("uri", r.RequestURI)
-	logger.Debug("received validation request")
+	logger.Info("received validation request")
 
 	payload, err := getAdmissionReview(*r)
 	if err != nil {

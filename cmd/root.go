@@ -5,8 +5,6 @@ import (
 	"os"
 
 	"github.com/RedLabsPlatform/kube-shield/pkg/webhook/cache"
-	"github.com/RedLabsPlatform/kube-shield/pkg/webhook/engine"
-	"github.com/RedLabsPlatform/kube-shield/pkg/webhook/server"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -64,13 +62,13 @@ func start(cmd *cobra.Command, args []string) {
 	}
 	index := cache.NewCacheIndex()
 	cachectrl := cache.NewCacheController(dc, index)
-	ng := &engine.Engine{
-		CacheController: cachectrl,
-	}
-	srv := server.Server{
-		Engine: ng,
-	}
+	// ng := &engine.Engine{
+	// 	CacheController: cachectrl,
+	// }
+	// srv := server.Server{
+	// 	Engine: ng,
+	// }
 
-	go cachectrl.Run(make(chan struct{}), make(chan struct{}))
-	srv.Start()
+	cachectrl.Run(make(chan struct{}), make(chan struct{}))
+	//srv.Start()
 }
