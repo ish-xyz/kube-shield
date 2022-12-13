@@ -1,8 +1,6 @@
 package cache
 
 import (
-	"fmt"
-
 	v1 "github.com/RedLabsPlatform/kube-shield/pkg/apis/v1"
 	"github.com/sirupsen/logrus"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
@@ -41,7 +39,6 @@ func (c *Controller) onPolicyUpdate(oldObj interface{}, newObj interface{}) {
 func (c *Controller) onPolicyAdd(obj interface{}) {
 
 	var policy *v1.Policy
-	fmt.Println("here")
 	err := runtime.DefaultUnstructuredConverter.FromUnstructured(obj.(*unstructured.Unstructured).Object, &policy)
 	if err != nil {
 		logrus.Fatal("failed to unmarshal unstructured object into Policy")

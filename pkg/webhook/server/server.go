@@ -21,7 +21,7 @@ func (s *Server) Start() {
 
 	// Run tls server
 	logrus.Infoln("serving requests on :8000")
-	logrus.Fatal(http.ListenAndServeTLS(":8000", "./certs/server.crt", "./certs/server.key", nil))
+	logrus.Fatal(http.ListenAndServeTLS("0.0.0.0:8000", "./certs/server.crt", "./certs/server.key", nil))
 }
 
 // ServeValidatePods validates an admission request and then writes an admission review to `w`
