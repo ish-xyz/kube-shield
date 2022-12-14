@@ -41,3 +41,12 @@ func (c *CacheIndex) Delete(ns Namespace, grp Group, ver Version, kind Kind, nam
 		c.Policies[ns][grp][ver][kind] = newPoliciesArr
 	}
 }
+
+func (c *CacheIndex) Get(ns Namespace, grp Group, ver Version, kind Kind) []PolicyName {
+
+	if _, ok := c.Policies[ns][grp][ver][kind]; !ok {
+		return []PolicyName{}
+	} else {
+		return c.Policies[ns][grp][ver][kind]
+	}
+}

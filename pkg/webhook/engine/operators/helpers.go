@@ -2,44 +2,46 @@ package operators
 
 import (
 	"fmt"
-	"strconv"
-
 	"strings"
 
 	v1 "github.com/RedLabsPlatform/kube-shield/pkg/apis/v1"
 	"github.com/tidwall/gjson"
-	"golang.org/x/exp/constraints"
 )
 
-type GenericNumber interface {
-	constraints.Float | constraints.Integer
-}
-
-func getNumber(v string) (float64, error) {
-
-	val, err := strconv.ParseFloat(v, 64)
-	if err != nil {
-		return 0, fmt.Errorf("failed to convert to number: %v", err)
+func getTypedPayloadValue(v gjson.Result) interface{} {
+	switch v.Type.String() {
+	case "String":
+		return v.Str
+	case "Number":
+		if float64(int(v.Num)) == v.Num {
+			return int(v.Num)
+		}
+		return v.Num
+	case "True":
+		return true
+	case "False":
+		return false
+	case "Null":
+		return nil
+	default:
+		return v.Raw
 	}
-
-	return val, err
-
 }
 
-func isInt(v float64) bool {
-	return v == float64(int(v))
-}
-
-func getValues(address string, jsonData string) []gjson.Result {
+func getPayloadValues(address string, jsonData string) []gjson.Result {
 	address = strings.TrimPrefix(address, "$_.")
 	return gjson.Get(jsonData, address).Array()
 }
 
-func getStringValue(v gjson.Result) string {
-	if v.Str != "" {
-		return v.Str
+func getPolicyValue(v interface{}, payload string) interface{} {
+	if strings.HasPrefix(fmt.Sprintf("%v", v), "$_.") {
+		payloadValues := getPayloadValues(v.(string), payload)
+		if len(payload) > 0 {
+			return getTypedPayloadValue(payloadValues[0])
+		}
+		return ""
 	}
-	return fmt.Sprintf("%v", v)
+	return v
 }
 
 func CreateCheckResult(res bool, msg string) *v1.CheckResult {

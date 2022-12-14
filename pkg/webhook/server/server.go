@@ -1,70 +1,58 @@
 package server
 
 import (
-	"crypto/tls"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"log"
+	"net"
 	"net/http"
 
-	"github.com/RedLabsPlatform/kube-shield/pkg/config"
+	"github.com/RedLabsPlatform/kube-shield/pkg/webhook/engine"
 	"github.com/sirupsen/logrus"
 	admissionv1 "k8s.io/api/admission/v1"
 )
 
 type Server struct {
-	Http        *http.Server
-	WebhookPath string
-	Debug       bool
+	Engine *engine.Engine
 }
 
-func NewServer(cfg *config.Config) (*Server, error) {
+func (s *Server) Start() {
 
-	cert, err := tls.LoadX509KeyPair(cfg.TLSCert, cfg.TLSKey)
-	if err != nil {
-		return nil, err
-	}
-
-	return &Server{
-		Http: &http.Server{
-			Addr: cfg.Address,
-			TLSConfig: &tls.Config{
-				Certificates: []tls.Certificate{cert},
-			},
-		},
-		WebhookPath: cfg.Path,
-		Debug:       cfg.Debug,
-	}, nil
-}
-
-func (s *Server) Run() error {
-
-	fmt.Printf("+%v", s)
-
-	http.HandleFunc("/validate", ServeValidate)
+	http.HandleFunc("/validate", s.ServeValidate)
 
 	// Run tls server
-	err := s.Http.ListenAndServeTLS("", "")
-	return err
+	addr := ":8000" //TODO: should be a parameter
+	logrus.Infoln("serving requests on" + addr)
+	// TODO: temporary for testing with minikube (it doesn't support tunneling over IPV6)
+	// logrus.Fatal(http.ListenAndServeTLS("0.0.0.0:8001", "./certs/server.crt", "./certs/server.key", nil))
+	l, err := net.Listen("tcp4", addr)
+	if err != nil {
+		log.Fatal(err)
+	}
+	logrus.Fatal(http.ServeTLS(l, nil, "./certs/server.crt", "./certs/server.key"))
+
 }
 
 // ServeValidatePods validates an admission request and then writes an admission review to `w`
-func ServeValidate(w http.ResponseWriter, r *http.Request) {
+func (s *Server) ServeValidate(w http.ResponseWriter, r *http.Request) {
 	logger := logrus.WithField("uri", r.RequestURI)
-	logger.Debug("received validation request")
+	logger.Info("received validation request")
 
-	payload, err := parseRequest(*r)
+	payload, err := getAdmissionReview(r)
 	if err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	logger.Warnln(payload)
+	s.Engine.Run(payload)
+	w.WriteHeader(500)
+	fmt.Fprint(w, "internal server error")
 }
 
-// parseRequest extracts an AdmissionReview from an http.Request if possible
-func parseRequest(r http.Request) (*admissionv1.AdmissionReview, error) {
+// getAdmissionReview extracts an AdmissionReview from an http.Request if possible
+func getAdmissionReview(r *http.Request) (*admissionv1.AdmissionReview, error) {
 
 	var a admissionv1.AdmissionReview
 

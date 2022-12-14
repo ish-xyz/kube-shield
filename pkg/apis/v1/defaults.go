@@ -30,10 +30,10 @@ var (
 	GroupVersion = schema.GroupVersion{Group: "kube-shield.red-labs.co.uk", Version: "v1"}
 
 	// Cluster Policy Kind (string)
-	ClusterPolicyKind = "ClusterPolicy"
+	ClusterPolicyKind = "clusterpolicies"
 
 	// Policy Kind (string)
-	PolicyKind = "Policy"
+	PolicyKind = "policies"
 
 	// SchemeBuilder is used to add go types to the GroupVersionKind scheme
 	SchemeBuilder = &scheme.Builder{GroupVersion: GroupVersion}
