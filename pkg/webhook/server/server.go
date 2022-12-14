@@ -39,7 +39,7 @@ func (s *Server) ServeValidate(w http.ResponseWriter, r *http.Request) {
 	logger := logrus.WithField("uri", r.RequestURI)
 	logger.Info("received validation request")
 
-	payload, err := getAdmissionReview(*r)
+	payload, err := getAdmissionReview(r)
 	if err != nil {
 		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusBadRequest)
@@ -47,11 +47,12 @@ func (s *Server) ServeValidate(w http.ResponseWriter, r *http.Request) {
 	}
 
 	s.Engine.Run(payload)
-	http.Error(w, err.Error(), http.StatusBadRequest)
+	w.WriteHeader(500)
+	fmt.Fprint(w, "internal server error")
 }
 
 // getAdmissionReview extracts an AdmissionReview from an http.Request if possible
-func getAdmissionReview(r http.Request) (*admissionv1.AdmissionReview, error) {
+func getAdmissionReview(r *http.Request) (*admissionv1.AdmissionReview, error) {
 
 	var a admissionv1.AdmissionReview
 

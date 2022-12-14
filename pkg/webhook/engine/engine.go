@@ -15,10 +15,9 @@ func (e *Engine) Run(payload *admissionv1.AdmissionReview) {
 	ns := cache.Namespace(payload.Request.Namespace)
 	group, version := e.CacheController.GetGV(payload.APIVersion)
 	kind := cache.Kind(payload.Kind)
-
-	e.Logger.Debugln("policies for payload")
 	store := e.CacheController.NamespaceInformer.GetStore()
-	for _, v := range index.Policies[ns][group][version][kind] {
+
+	for _, v := range index.Get(ns, group, version, kind) {
 		fmt.Println(v)
 		obj, exists, err := store.GetByKey(string(v))
 		if err != nil {
