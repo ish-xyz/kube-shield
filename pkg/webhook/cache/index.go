@@ -4,6 +4,10 @@ package cache
 This file defines the Cache Index logic and methods
 */
 
+import (
+	v1 "github.com/RedLabsPlatform/kube-shield/pkg/apis/v1"
+)
+
 func NewCacheIndex() *CacheIndex {
 
 	return &CacheIndex{
@@ -11,17 +15,33 @@ func NewCacheIndex() *CacheIndex {
 	}
 }
 
-// Add resource address into Cache Index
-// Resource address example: NS/GROUP/VERSION/KIND/RULENAME
-func (c *CacheIndex) AddVerbs(verbs ...string) {
-	for _, verb := range verbs {
-		if _, ok := c.Policies[Verb(verb)]; !ok {
-			c.Policies[Verb(verb)] = make(map[Namespace]map[Group]map[Resource][]PolicyName)
-		}
+// Delete policy for all entries
+func (c *CacheIndex) Delete(entries []*v1.Definition, namespace, name string) {
+	for _, def := range entries {
+		c.DeleteSingleEntry(
+			Verb(def.Verb),
+			Namespace(namespace),
+			GetGroup(def.ApiGroup),
+			Resource(def.Resource),
+			PolicyName(name),
+		)
 	}
 }
 
-func (c *CacheIndex) Add(verb Verb, ns Namespace, grp Group, res Resource, name PolicyName) {
+// Add policy for all entries
+func (c *CacheIndex) Add(entries []*v1.Definition, namespace, name string) {
+	for _, def := range entries {
+		c.AddSingleEntry(
+			Verb(def.Verb),
+			Namespace(namespace),
+			GetGroup(def.ApiGroup),
+			Resource(def.Resource),
+			PolicyName(name),
+		)
+	}
+}
+
+func (c *CacheIndex) AddSingleEntry(verb Verb, ns Namespace, grp Group, res Resource, name PolicyName) {
 
 	if _, ok := c.Policies[verb]; !ok {
 		c.Policies[verb] = make(map[Namespace]map[Group]map[Resource][]PolicyName)
@@ -42,7 +62,7 @@ func (c *CacheIndex) Add(verb Verb, ns Namespace, grp Group, res Resource, name 
 	}
 }
 
-func (c *CacheIndex) Delete(verb Verb, ns Namespace, grp Group, res Resource, name PolicyName) {
+func (c *CacheIndex) DeleteSingleEntry(verb Verb, ns Namespace, grp Group, res Resource, name PolicyName) {
 	if _, exists := c.Policies[verb][ns][grp][res]; exists {
 		var newPoliciesArr []PolicyName
 		for _, cachedPolicyName := range c.Policies[verb][ns][grp][res] {

@@ -85,24 +85,8 @@ func (c *Controller) onPolicyUpdate(oldObj interface{}, newObj interface{}) {
 
 	// lock index, remove old policies and add new ones
 	c.CacheIndex.Lock()
-	for _, def := range oldPolicy.Spec.ApplyOn {
-		c.CacheIndex.Delete(
-			Verb(def.Verb),
-			Namespace(oldPolicy.Namespace),
-			getGroup(def.ApiGroup),
-			Resource(def.Resource),
-			PolicyName(oldPolicy.Name),
-		)
-	}
-	for _, def := range newPolicy.Spec.ApplyOn {
-		c.CacheIndex.Delete(
-			Verb(def.Verb),
-			Namespace(newPolicy.Namespace),
-			getGroup(def.ApiGroup),
-			Resource(def.Resource),
-			PolicyName(newPolicy.Name),
-		)
-	}
+	c.CacheIndex.Delete(oldPolicy.Spec.ApplyOn, oldPolicy.Namespace, oldPolicy.Name)
+	c.CacheIndex.Add(newPolicy.Spec.ApplyOn, newPolicy.Namespace, newPolicy.Name)
 	c.CacheIndex.Unlock()
 }
 
@@ -116,17 +100,9 @@ func (c *Controller) onPolicyAdd(obj interface{}) {
 		return
 	}
 
-	for _, def := range policy.Spec.ApplyOn {
-		c.CacheIndex.Lock()
-		c.CacheIndex.Add(
-			Verb(def.Verb),
-			Namespace(policy.Namespace),
-			GetGroup(def.ApiGroup),
-			Resource(def.Resource),
-			PolicyName(policy.Name),
-		)
-		c.CacheIndex.Unlock()
-	}
+	c.CacheIndex.Lock()
+	c.CacheIndex.Add(policy.Spec.ApplyOn, policy.Namespace, policy.Name)
+	c.CacheIndex.Unlock()
 }
 
 // Policy delete event handler
@@ -138,20 +114,10 @@ func (c *Controller) onPolicyDelete(obj interface{}) {
 		return
 	}
 
-	for _, def := range policy.Spec.ApplyOn {
-		c.CacheIndex.Lock()
-		c.CacheIndex.Delete(
-			Verb(def.Verb),
-			Namespace(policy.Namespace),
-			GetGroup(def.ApiGroup),
-			Resource(def.Resource),
-			PolicyName(policy.Name),
-		)
-		c.CacheIndex.Unlock()
-	}
+	c.CacheIndex.Lock()
+	c.CacheIndex.Delete(policy.Spec.ApplyOn, policy.Namespace, policy.Name)
+	c.CacheIndex.Unlock()
 }
-
-// ** Cluster scope policies
 
 // ClusterPolicy update event handler
 func (c *Controller) onClusterPolicyUpdate(oldObj interface{}, newObj interface{}) {
@@ -168,68 +134,36 @@ func (c *Controller) onClusterPolicyUpdate(oldObj interface{}, newObj interface{
 
 	// lock index, remove old policies and add new ones
 	c.CacheIndex.Lock()
-	for _, def := range oldPolicy.Spec.ApplyOn {
-		c.CacheIndex.Delete(
-			Verb(def.Verb),
-			Namespace(oldPolicy.Namespace),
-			GetGroup(def.ApiGroup),
-			Resource(def.Resource),
-			PolicyName(oldPolicy.Name),
-		)
-	}
-	for _, def := range newPolicy.Spec.ApplyOn {
-		c.CacheIndex.Delete(
-			Verb(def.Verb),
-			Namespace(newPolicy.Namespace),
-			GetGroup(def.ApiGroup),
-			Resource(def.Resource),
-			PolicyName(newPolicy.Name),
-		)
-	}
+	c.CacheIndex.Delete(oldPolicy.Spec.ApplyOn, oldPolicy.Namespace, oldPolicy.Name)
+	c.CacheIndex.Add(newPolicy.Spec.ApplyOn, newPolicy.Namespace, newPolicy.Name)
 	c.CacheIndex.Unlock()
 }
 
 // ClusterPolicy add event handler
 func (c *Controller) onClusterPolicyAdd(obj interface{}) {
-	var clusterpolicy *v1.ClusterPolicy
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(obj.(*unstructured.Unstructured).Object, &clusterpolicy)
+	var policy *v1.ClusterPolicy
+	err := runtime.DefaultUnstructuredConverter.FromUnstructured(obj.(*unstructured.Unstructured).Object, &policy)
 	if err != nil {
 		logrus.Fatal("failed to unmarshal unstructured object into ClusterPolicy")
 		return
 	}
 
-	for _, def := range clusterpolicy.Spec.ApplyOn {
-		c.CacheIndex.Lock()
-		c.CacheIndex.Add(
-			Verb(def.Verb),
-			Namespace("_ClusterScope"),
-			GetGroup(def.ApiGroup),
-			Resource(def.Resource),
-			PolicyName(clusterpolicy.Name),
-		)
-		c.CacheIndex.Unlock()
-	}
+	c.CacheIndex.Lock()
+	c.CacheIndex.Add(policy.Spec.ApplyOn, policy.Namespace, policy.Name)
+	c.CacheIndex.Unlock()
 }
 
 // ClusterPolicy delete event handler
 func (c *Controller) onClusterPolicyDelete(obj interface{}) {
 
-	var clusterpolicy *v1.ClusterPolicy
-	err := runtime.DefaultUnstructuredConverter.FromUnstructured(obj.(*unstructured.Unstructured).Object, &clusterpolicy)
+	var policy *v1.ClusterPolicy
+	err := runtime.DefaultUnstructuredConverter.FromUnstructured(obj.(*unstructured.Unstructured).Object, &policy)
 	if err != nil {
 		logrus.Errorln("failed to unmarshal unstructured object into ClusterPolicy")
 		return
 	}
 
-	for _, def := range clusterpolicy.Spec.ApplyOn {
-		c.CacheIndex.Lock()
-		c.CacheIndex.Delete(
-			Verb(def.Verb),
-			Namespace("_ClusterScope"),
-			GetGroup(def.ApiGroup),
-			Resource(def.Resource),
-			PolicyName(clusterpolicy.Name),
-		)
-		c.CacheIndex.Unlock()
-	}
+	c.CacheIndex.Lock()
+	c.CacheIndex.Delete(policy.Spec.ApplyOn, policy.Namespace, policy.Name)
+	c.CacheIndex.Unlock()
 }
