@@ -19,7 +19,7 @@ type ClusterPolicySpec struct {
 	// +kubebuilder:validation:Required
 	// +kubebuilder:validation:MaxItems=500
 	// +kubebuilder:validation:MinItems=1
-	ApplyOn []*ResourceAddress `json:"applyOn"`
+	ApplyOn []*Resource `json:"applyOn"`
 	// +kubebuilder:validation:MaxItems=500
 	// +kubebuilder:validation:MinItems=1
 	// +kubebuilder:validation:Required

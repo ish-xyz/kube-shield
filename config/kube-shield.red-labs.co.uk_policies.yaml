@@ -5,14 +5,14 @@ metadata:
   annotations:
     controller-gen.kubebuilder.io/version: v0.10.0
   creationTimestamp: null
-  name: clusterpolicies.kube-shield.red-labs.co.uk
+  name: policies.kube-shield.red-labs.co.uk
 spec:
   group: kube-shield.red-labs.co.uk
   names:
-    kind: ClusterPolicy
-    listKind: ClusterPolicyList
-    plural: clusterpolicies
-    singular: clusterpolicy
+    kind: Policy
+    listKind: PolicyList
+    plural: policies
+    singular: policy
   scope: Namespaced
   versions:
   - name: v1
@@ -81,7 +81,7 @@ spec:
                             - Count
                             type: string
                           value:
-                            x-kubernetes-preserve-unknown-fields: true
+                            type: string
                         required:
                         - field
                         - operator

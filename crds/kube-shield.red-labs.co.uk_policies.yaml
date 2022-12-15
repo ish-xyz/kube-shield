@@ -36,13 +36,22 @@ spec:
               applyOn:
                 items:
                   properties:
-                    apiVersion:
-                      type: string
-                    kind:
-                      type: string
+                    apiGroups:
+                      items:
+                        type: string
+                      type: array
+                    resources:
+                      items:
+                        type: string
+                      type: array
+                    verbs:
+                      items:
+                        type: string
+                      type: array
                   required:
-                  - apiVersion
-                  - kind
+                  - apiGroups
+                  - resources
+                  - verbs
                   type: object
                 maxItems: 500
                 minItems: 1

@@ -46,6 +46,17 @@ func (s *Server) ServeValidate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	if payload.Request.Kind.Kind == "PodExecOptions" {
+		fmt.Println(payload)
+		fmt.Println(payload.Request.Operation, payload.Request.Kind.Kind)
+		fmt.Println(string(payload.Request.Object.Raw))
+	}
+
+	// if payload.Request.Kind.Kind != "Endpoints" {
+	// 	fmt.Println(payload)
+	// 	fmt.Println(string(payload.Request.Object.Raw))
+	// }
+
 	s.Engine.RunNamespacedPolicies(payload)
 	w.WriteHeader(500)
 	fmt.Fprint(w, "internal server error")

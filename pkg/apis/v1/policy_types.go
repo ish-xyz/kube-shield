@@ -24,7 +24,7 @@ type PolicySpec struct {
 	// +kubebuilder:validation:Required
 	// +kubebuilder:validation:MaxItems=500
 	// +kubebuilder:validation:MinItems=1
-	ApplyOn []*ResourceAddress `json:"applyOn"`
+	ApplyOn []*Resource `json:"applyOn"`
 	// +kubebuilder:validation:MaxItems=500
 	// +kubebuilder:validation:MinItems=1
 	// +kubebuilder:validation:Required
@@ -49,11 +49,13 @@ type PolicyList struct {
 	Items           []Policy `json:"items"`
 }
 
-type ResourceAddress struct {
+type Resource struct {
 	// +kubebuilder:validation:Required
-	APIVersion string `json:"apiVersion"`
+	apiGroups []string `json:"apiGroups"`
 	// +kubebuilder:validation:Required
-	Kind string `json:"kind"`
+	resources []string `json:"resources"`
+	// +kubebuilder:validation:Required
+	verbs []string `json:"verbs"`
 }
 
 type Check struct {
