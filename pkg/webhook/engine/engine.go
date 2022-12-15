@@ -10,12 +10,15 @@ import (
 func (e *Engine) RunNamespacedPolicies(payload *admissionv1.AdmissionReview) {
 
 	index := e.CacheController.CacheIndex
-	ns := cache.Namespace(payload.Request.Namespace)
-	group, version := e.CacheController.GetGV(payload.Request.Kind.Group + payload.Request.Kind.Version)
-	kind := cache.Kind(payload.Request.Kind.Kind)
 	store := e.CacheController.NamespaceInformer.GetStore()
+	req := payload.Request
 
-	for _, v := range index.Get(ns, group, version, kind) {
+	verb := cache.Verb(string(req.Operation))
+	ns := cache.Namespace(req.Namespace)
+	group := cache.GetGroup(req.Resource.Group)
+	res := cache.GetResource(req.RequestResource.Resource, req.SubResource)
+
+	for _, v := range index.Get(verb, ns, group, res) {
 		obj, exists, err := store.GetByKey(string(v))
 		fmt.Println(obj, exists, err)
 		if err != nil {

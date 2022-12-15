@@ -1,5 +1,9 @@
 package cache
 
+/*
+This file defines the Cache Index logic and methods
+*/
+
 func NewCacheIndex() *CacheIndex {
 
 	return &CacheIndex{
@@ -9,6 +13,14 @@ func NewCacheIndex() *CacheIndex {
 
 // Add resource address into Cache Index
 // Resource address example: NS/GROUP/VERSION/KIND/RULENAME
+func (c *CacheIndex) AddVerbs(verbs ...string) {
+	for _, verb := range verbs {
+		if _, ok := c.Policies[Verb(verb)]; !ok {
+			c.Policies[Verb(verb)] = make(map[Namespace]map[Group]map[Resource][]PolicyName)
+		}
+	}
+}
+
 func (c *CacheIndex) Add(verb Verb, ns Namespace, grp Group, res Resource, name PolicyName) {
 
 	if _, ok := c.Policies[verb]; !ok {
@@ -42,7 +54,7 @@ func (c *CacheIndex) Delete(verb Verb, ns Namespace, grp Group, res Resource, na
 	}
 }
 
-func (c *CacheIndex) Get(verb Verb, ns Namespace, grp Group, res Resource, name PolicyName) []PolicyName {
+func (c *CacheIndex) Get(verb Verb, ns Namespace, grp Group, res Resource) []PolicyName {
 
 	if _, ok := c.Policies[verb][ns][grp][res]; !ok {
 		return []PolicyName{}

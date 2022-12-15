@@ -22,9 +22,7 @@ type PolicySpec struct {
 	// +kubebuilder:validation:Enum=IfMatchAllow;IfMatchDeny
 	DefaultBehaviour string `json:"defaultBehaviour"`
 	// +kubebuilder:validation:Required
-	// +kubebuilder:validation:MaxItems=500
-	// +kubebuilder:validation:MinItems=1
-	ApplyOn []*Resource `json:"applyOn"`
+	ApplyOn []*Definition `json:"applyOn"`
 	// +kubebuilder:validation:MaxItems=500
 	// +kubebuilder:validation:MinItems=1
 	// +kubebuilder:validation:Required
@@ -49,13 +47,13 @@ type PolicyList struct {
 	Items           []Policy `json:"items"`
 }
 
-type Resource struct {
+type Definition struct {
 	// +kubebuilder:validation:Required
-	apiGroups []string `json:"apiGroups"`
+	ApiGroup string `json:"apiGroups"`
 	// +kubebuilder:validation:Required
-	resources []string `json:"resources"`
+	Resource string `json:"resources"`
 	// +kubebuilder:validation:Required
-	verbs []string `json:"verbs"`
+	Verb string `json:"verbs"`
 }
 
 type Check struct {
@@ -67,6 +65,7 @@ type Check struct {
 	Operator string `json:"operator"`
 
 	// +kubebuilder:validation:Required
+	// +kubebuilder:validation:XPreserveUnknownFields
 	Value interface{} `json:"value"`
 }
 

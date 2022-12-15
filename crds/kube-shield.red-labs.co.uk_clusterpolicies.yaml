@@ -37,24 +37,16 @@ spec:
                 items:
                   properties:
                     apiGroups:
-                      items:
-                        type: string
-                      type: array
+                      type: string
                     resources:
-                      items:
-                        type: string
-                      type: array
+                      type: string
                     verbs:
-                      items:
-                        type: string
-                      type: array
+                      type: string
                   required:
                   - apiGroups
                   - resources
                   - verbs
                   type: object
-                maxItems: 500
-                minItems: 1
                 type: array
               defaultBehaviour:
                 default: IfMatchDeny

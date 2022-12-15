@@ -5,9 +5,9 @@ metadata:
   name: deny-pods-kube-system
 spec:
   applyOn:
-    - operation: *
-      apiVersion: v1
-      resource: Pod
+    verbs:
+    groups:
+    resources: 
   defaultBehaviour: IfMatchDeny
   rules:
   - name: rule-name
