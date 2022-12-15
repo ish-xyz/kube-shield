@@ -2,6 +2,7 @@ package engine
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/RedLabsPlatform/kube-shield/pkg/webhook/cache"
 	admissionv1 "k8s.io/api/admission/v1"
@@ -13,11 +14,12 @@ func (e *Engine) RunNamespacedPolicies(payload *admissionv1.AdmissionReview) {
 	store := e.CacheController.NamespaceInformer.GetStore()
 	req := payload.Request
 
-	verb := cache.Verb(string(req.Operation))
+	verb := cache.Verb(strings.ToLower(string(req.Operation)))
 	ns := cache.Namespace(req.Namespace)
 	group := cache.GetGroup(req.Resource.Group)
 	res := cache.GetResource(req.RequestResource.Resource, req.SubResource)
 
+	fmt.Println(verb, ns, group, res)
 	for _, v := range index.Get(verb, ns, group, res) {
 		obj, exists, err := store.GetByKey(string(v))
 		fmt.Println(obj, exists, err)
