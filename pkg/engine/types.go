@@ -1,7 +1,7 @@
 package engine
 
 import (
-	"github.com/RedLabsPlatform/kube-shield/pkg/webhook/cache"
+	"github.com/RedLabsPlatform/kube-shield/pkg/cache"
 	"github.com/sirupsen/logrus"
 )
 

@@ -21,7 +21,7 @@ func (c *CacheIndex) Delete(entries []*v1.Definition, namespace, name string) {
 		c.DeleteSingleEntry(
 			Verb(def.Verb),
 			Namespace(namespace),
-			GetGroup(def.ApiGroup),
+			GetGroup(def.Group),
 			Resource(def.Resource),
 			PolicyName(name),
 		)
@@ -34,7 +34,7 @@ func (c *CacheIndex) Add(entries []*v1.Definition, namespace, name string) {
 		c.AddSingleEntry(
 			Verb(def.Verb),
 			Namespace(namespace),
-			GetGroup(def.ApiGroup),
+			GetGroup(def.Group),
 			Resource(def.Resource),
 			PolicyName(name),
 		)

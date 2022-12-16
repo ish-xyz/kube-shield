@@ -8,7 +8,7 @@ import (
 	"net"
 	"net/http"
 
-	"github.com/RedLabsPlatform/kube-shield/pkg/webhook/engine"
+	"github.com/RedLabsPlatform/kube-shield/pkg/engine"
 	"github.com/sirupsen/logrus"
 	admissionv1 "k8s.io/api/admission/v1"
 )

@@ -49,11 +49,11 @@ type PolicyList struct {
 
 type Definition struct {
 	// +kubebuilder:validation:Required
-	ApiGroup string `json:"apiGroups"`
+	Group string `json:"group"`
 	// +kubebuilder:validation:Required
-	Resource string `json:"resources"`
+	Resource string `json:"resource"`
 	// +kubebuilder:validation:Required
-	Verb string `json:"verbs"`
+	Verb string `json:"verb"`
 }
 
 type Check struct {
@@ -66,6 +66,7 @@ type Check struct {
 
 	// +kubebuilder:validation:Required
 	// +kubebuilder:validation:XPreserveUnknownFields
+	//Value string `json:"value"`
 	Value interface{} `json:"value"`
 }
 

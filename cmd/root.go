@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/RedLabsPlatform/kube-shield/pkg/webhook/cache"
-	"github.com/RedLabsPlatform/kube-shield/pkg/webhook/engine"
-	"github.com/RedLabsPlatform/kube-shield/pkg/webhook/server"
+	"github.com/RedLabsPlatform/kube-shield/pkg/cache"
+	"github.com/RedLabsPlatform/kube-shield/pkg/engine"
+	"github.com/RedLabsPlatform/kube-shield/pkg/server"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"

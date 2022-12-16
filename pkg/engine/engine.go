@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/RedLabsPlatform/kube-shield/pkg/webhook/cache"
+	"github.com/RedLabsPlatform/kube-shield/pkg/cache"
 	admissionv1 "k8s.io/api/admission/v1"
 )
 

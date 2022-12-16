@@ -36,16 +36,16 @@ spec:
               applyOn:
                 items:
                   properties:
-                    apiGroups:
+                    group:
                       type: string
-                    resources:
+                    resource:
                       type: string
-                    verbs:
+                    verb:
                       type: string
                   required:
-                  - apiGroups
-                  - resources
-                  - verbs
+                  - group
+                  - resource
+                  - verb
                   type: object
                 type: array
               defaultBehaviour:
