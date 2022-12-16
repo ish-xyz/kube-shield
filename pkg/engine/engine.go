@@ -11,7 +11,7 @@ import (
 func (e *Engine) RunNamespacedPolicies(payload *admissionv1.AdmissionReview) {
 
 	index := e.CacheController.CacheIndex
-	store := e.CacheController.NamespaceInformer.GetStore()
+	namespacedStore := e.CacheController.NamespaceInformer.GetStore()
 	req := payload.Request
 
 	verb := cache.Verb(strings.ToLower(string(req.Operation)))
@@ -20,16 +20,17 @@ func (e *Engine) RunNamespacedPolicies(payload *admissionv1.AdmissionReview) {
 	res := cache.GetResource(req.RequestResource.Resource, req.SubResource)
 
 	fmt.Println(verb, ns, group, res)
-	for _, v := range index.Get(verb, ns, group, res) {
-		fmt.Println(v)
-		obj, exists, err := store.GetByKey(string(v))
+	for _, name := range index.Get(verb, ns, group, res) {
+
+		policyKey := fmt.Sprintf("%s/%s", ns, name)
+		obj, exists, err := namespacedStore.GetByKey(policyKey)
 		fmt.Println(obj, exists, err)
 		if err != nil {
-			e.Logger.Warnln("failed to get policy with name '%v', error: '%v'", v, err)
+			e.Logger.Warnln("failed to get policy with name '%v', error: '%v'", name, err)
 		}
 
 		if !exists {
-			e.Logger.Warnln("object %v is cached in index but the actual resource doesn't exists", v)
+			e.Logger.Warnln("object %v is cached in index but the actual resource doesn't exists", name)
 			continue
 		}
 	}
