@@ -21,6 +21,7 @@ func (e *Engine) RunNamespacedPolicies(payload *admissionv1.AdmissionReview) {
 
 	fmt.Println(verb, ns, group, res)
 	for _, v := range index.Get(verb, ns, group, res) {
+		fmt.Println(v)
 		obj, exists, err := store.GetByKey(string(v))
 		fmt.Println(obj, exists, err)
 		if err != nil {

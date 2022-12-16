@@ -5,7 +5,7 @@ metadata:
   name: deny-pods-kube-system
 spec:
   applyOn:
-  - verb: create
+  - verb: connect
     group: ""
     resource: pods/exec 
   defaultBehaviour: IfMatchDeny
