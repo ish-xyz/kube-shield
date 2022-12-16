@@ -6,6 +6,10 @@ import (
 	"k8s.io/client-go/tools/cache"
 )
 
+const (
+	CLUSTER_NAMESPACE = "_ClusterScope"
+)
+
 type Verb string
 
 type Namespace string

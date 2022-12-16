@@ -134,8 +134,8 @@ func (c *Controller) onClusterPolicyUpdate(oldObj interface{}, newObj interface{
 
 	// lock index, remove old policies and add new ones
 	c.CacheIndex.Lock()
-	c.CacheIndex.Delete(oldPolicy.Spec.ApplyOn, oldPolicy.Namespace, oldPolicy.Name)
-	c.CacheIndex.Add(newPolicy.Spec.ApplyOn, newPolicy.Namespace, newPolicy.Name)
+	c.CacheIndex.Delete(oldPolicy.Spec.ApplyOn, CLUSTER_NAMESPACE, oldPolicy.Name)
+	c.CacheIndex.Add(newPolicy.Spec.ApplyOn, CLUSTER_NAMESPACE, newPolicy.Name)
 	c.CacheIndex.Unlock()
 }
 
@@ -149,7 +149,7 @@ func (c *Controller) onClusterPolicyAdd(obj interface{}) {
 	}
 
 	c.CacheIndex.Lock()
-	c.CacheIndex.Add(policy.Spec.ApplyOn, policy.Namespace, policy.Name)
+	c.CacheIndex.Add(policy.Spec.ApplyOn, CLUSTER_NAMESPACE, policy.Name)
 	c.CacheIndex.Unlock()
 }
 
@@ -164,6 +164,6 @@ func (c *Controller) onClusterPolicyDelete(obj interface{}) {
 	}
 
 	c.CacheIndex.Lock()
-	c.CacheIndex.Delete(policy.Spec.ApplyOn, policy.Namespace, policy.Name)
+	c.CacheIndex.Delete(policy.Spec.ApplyOn, CLUSTER_NAMESPACE, policy.Name)
 	c.CacheIndex.Unlock()
 }
