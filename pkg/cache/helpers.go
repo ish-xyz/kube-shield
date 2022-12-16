@@ -11,7 +11,7 @@ This a general purpose file, all helper functions for this package should end up
 // Returning the API group name typed as Group
 func GetGroup(grp string) Group {
 	if grp == "" {
-		return "_core"
+		return CORE_GROUP
 	}
 	return Group(grp)
 }

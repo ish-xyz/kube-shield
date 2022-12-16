@@ -7,7 +7,8 @@ import (
 )
 
 const (
-	CLUSTER_NAMESPACE = "_ClusterScope"
+	CLUSTER_SCOPE = "_ClusterScope"
+	CORE_GROUP    = "_core"
 )
 
 type Verb string
