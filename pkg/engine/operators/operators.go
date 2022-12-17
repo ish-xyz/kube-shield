@@ -13,6 +13,16 @@ const (
 	NOTEQUAL = "NotEqual"
 )
 
+func Run(payload string, check *v1.Check) (*v1.CheckResult, error) {
+	switch check.Operator {
+	case EQUAL:
+		return compare(payload, check), nil
+	case NOTEQUAL:
+		return compare(payload, check), nil
+	}
+	return nil, fmt.Errorf("unknown operator '%s'", check.Operator)
+}
+
 func compare(payload string, check *v1.Check) *v1.CheckResult {
 
 	msg := ""

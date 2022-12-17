@@ -12,7 +12,7 @@ spec:
   rules:
   - name: rule-name
     checks:
-    - field: $_.input.metadata.namespace
+    - field: $_.metadata.namespace
       operator: Equal
       value: kube-system
 
