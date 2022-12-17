@@ -2,7 +2,7 @@
 apiVersion: kube-shield.red-labs.co.uk/v1
 kind: Policy
 metadata:
-  name: deny-pods-kube-system
+  name: deny-exec-kube-system
 spec:
   applyOn:
   - verb: connect

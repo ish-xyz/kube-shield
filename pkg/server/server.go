@@ -46,7 +46,7 @@ func (s *Server) ServeValidate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	s.Engine.RunNamespacedPolicies(payload)
+	s.Engine.RunNamespacePolicies(payload)
 	w.WriteHeader(500)
 	fmt.Fprint(w, "internal server error")
 }

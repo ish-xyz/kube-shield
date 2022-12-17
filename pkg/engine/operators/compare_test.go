@@ -19,7 +19,7 @@ func TestEqual2DynamicValues(t *testing.T) {
 	res := compare(payload, check)
 
 	assert.Equal(t, res.Message, "")
-	assert.True(t, res.Result)
+	assert.True(t, res.Match)
 }
 
 func TestNotEqual2DynamicValues(t *testing.T) {
@@ -34,7 +34,7 @@ func TestNotEqual2DynamicValues(t *testing.T) {
 	res := compare(payload, check)
 
 	assert.Equal(t, res.Message, "")
-	assert.True(t, res.Result)
+	assert.True(t, res.Match)
 }
 
 func TestEqualFailed(t *testing.T) {
@@ -49,7 +49,7 @@ func TestEqualFailed(t *testing.T) {
 	res := compare(payload, check)
 
 	assert.NotEqual(t, res.Message, "")
-	assert.Equal(t, res.Result, false)
+	assert.Equal(t, res.Match, false)
 }
 
 func TestNotEqualFailed(t *testing.T) {
@@ -64,7 +64,7 @@ func TestNotEqualFailed(t *testing.T) {
 	res := compare(payload, check)
 
 	assert.NotEqual(t, res.Message, "")
-	assert.False(t, res.Result)
+	assert.False(t, res.Match)
 }
 
 func TestEqualTypeMismatchBool(t *testing.T) {
@@ -79,7 +79,7 @@ func TestEqualTypeMismatchBool(t *testing.T) {
 	res := compare(payload, check)
 
 	assert.NotEqual(t, res.Message, "")
-	assert.False(t, res.Result)
+	assert.False(t, res.Match)
 }
 
 func TestEqualTypeMismatchInt(t *testing.T) {
@@ -94,7 +94,7 @@ func TestEqualTypeMismatchInt(t *testing.T) {
 	res := compare(payload, check)
 
 	assert.NotEqual(t, res.Message, "")
-	assert.False(t, res.Result)
+	assert.False(t, res.Match)
 }
 
 func TestEqualEmpty(t *testing.T) {
@@ -109,7 +109,7 @@ func TestEqualEmpty(t *testing.T) {
 	res := compare(payload, check)
 
 	assert.NotEqual(t, res.Message, "")
-	assert.False(t, res.Result)
+	assert.False(t, res.Match)
 }
 
 func TestEqualTypeMismatchFloat(t *testing.T) {
@@ -124,5 +124,5 @@ func TestEqualTypeMismatchFloat(t *testing.T) {
 	res := compare(payload, check)
 
 	assert.NotEqual(t, res.Message, "")
-	assert.False(t, res.Result)
+	assert.False(t, res.Match)
 }

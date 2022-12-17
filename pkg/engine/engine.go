@@ -4,8 +4,11 @@ import (
 	"fmt"
 	"strings"
 
+	v1 "github.com/RedLabsPlatform/kube-shield/pkg/apis/v1"
 	"github.com/RedLabsPlatform/kube-shield/pkg/cache"
 	admissionv1 "k8s.io/api/admission/v1"
+	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
+	"k8s.io/apimachinery/pkg/runtime"
 )
 
 func (e *Engine) RunClusterPolicies(payload *admissionv1.AdmissionReview) {
@@ -51,9 +54,23 @@ func (e *Engine) RunNamespacePolicies(payload *admissionv1.AdmissionReview) {
 	res := cache.GetResource(req.RequestResource.Resource, req.SubResource)
 
 	for _, name := range index.Get(verb, ns, group, res) {
+		var policy *v1.Policy
 		policyKey := fmt.Sprintf("%s/%s", ns, name)
 		obj, exists, err := store.GetByKey(policyKey)
-		fmt.Println(obj, exists, err)
+
+		if err != nil || !exists {
+			e.Logger.Errorf("failed to get policy with key '%s'", policyKey)
+			continue
+		}
+
+		err = runtime.DefaultUnstructuredConverter.FromUnstructured(obj.(*unstructured.Unstructured).Object, &policy)
+		if err != nil {
+			e.Logger.Errorf("failed to convert policy with key '%s' into object", policyKey)
+			continue
+		}
+		for _, rule := range policy.Spec.Rules {
+			fmt.Println(rule)
+		}
 	}
 
 	// TODO

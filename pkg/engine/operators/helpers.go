@@ -44,9 +44,9 @@ func getPolicyValue(v interface{}, payload string) interface{} {
 	return v
 }
 
-func CreateCheckResult(res bool, msg string) *v1.CheckResult {
+func CreateCheckResult(match bool, msg string) *v1.CheckResult {
 	return &v1.CheckResult{
-		Result:  res,
+		Match:   match,
 		Message: msg,
 	}
 }

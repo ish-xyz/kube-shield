@@ -1,1 +1,0 @@
-check value should be an interface

@@ -71,7 +71,7 @@ type Check struct {
 }
 
 type CheckResult struct {
-	Result  bool
+	Match   bool
 	Message string
 }
 
