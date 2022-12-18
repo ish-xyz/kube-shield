@@ -13,7 +13,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 )
 
-// Checks are in AND condition, so if any of the checks don't match the desired result it returns an error
+// Checks are in AND, so if any of the checks don't match the desired result it returns an error
 // Nil error means that the checks have been successful
 func runChecks(req *admissionv1.AdmissionRequest, desiredResult bool, checks []*v1.Check) error {
 
@@ -30,6 +30,7 @@ func runChecks(req *admissionv1.AdmissionRequest, desiredResult bool, checks []*
 	return nil
 }
 
+// Rules are in OR, so if any of the rules have passed, the function returns a nil error
 func runRules(req *admissionv1.AdmissionRequest, policy *v1.Policy) error {
 
 	/*
@@ -45,7 +46,7 @@ func runRules(req *admissionv1.AdmissionRequest, policy *v1.Policy) error {
 	for _, rule := range policy.Spec.Rules {
 
 		err = runChecks(req, desiredResult, rule.Checks)
-		if err != nil {
+		if err == nil {
 			return nil
 		}
 	}
