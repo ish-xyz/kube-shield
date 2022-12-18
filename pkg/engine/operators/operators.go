@@ -50,5 +50,5 @@ func compare(payload string, check *v1.Check) *v1.CheckResult {
 
 	}
 
-	return CreateCheckResult(true, "")
+	return CreateCheckResult(true, fmt.Sprintf("Operator: '%s' -> value '%v' matched with values in list -> '%v'", check.Operator, checkValues, payloadValues))
 }

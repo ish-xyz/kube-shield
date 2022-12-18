@@ -51,7 +51,7 @@ func runRules(req *admissionv1.AdmissionRequest, policy *v1.Policy) error {
 		}
 	}
 
-	return fmt.Errorf("all rules on policy '%s' have failed. Last error was: '%v'", policy.Name, err)
+	return fmt.Errorf("\ndenied by policy '%s'. Error: %v", policy.Name, err)
 }
 
 func (e *Engine) RunNamespacePolicies(req *admissionv1.AdmissionRequest) error {
