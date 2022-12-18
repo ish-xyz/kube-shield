@@ -4,56 +4,84 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-	"log"
 	"net"
 	"net/http"
 
+	"github.com/RedLabsPlatform/kube-shield/pkg/engine"
 	"github.com/sirupsen/logrus"
-	"gorm.io/gorm/logger"
 	admissionv1 "k8s.io/api/admission/v1"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-func (s *Server) Start() {
+func NewServer(addr, certPath, keyPath string, ipv4 bool, engine *engine.Engine) *Server {
+
+	logger := logrus.WithField("component", "server")
+
+	return &Server{
+		Address:   addr,
+		ForceIPV4: ipv4,
+		TLS: &TLSConfig{
+			CertPath: certPath,
+			KeyPath:  keyPath,
+		},
+		Engine: engine,
+		Logger: logger,
+	}
+}
+
+// Start HTTP server
+func (s *Server) Start() error {
+
+	var listener net.Listener
+	listener, err := net.Listen("tcp6", s.Address)
+	if err != nil {
+		return err
+	}
+
+	if s.ForceIPV4 {
+		listener, err = net.Listen("tcp4", s.Address)
+	}
 
 	http.HandleFunc("/validate", s.ServeValidate)
 
-	// Run tls server
-	addr := ":8000" //TODO: should be a parameter
-	logrus.Infoln("serving requests on" + addr)
-	// TODO: temporary for testing with minikube (it doesn't support tunneling over IPV6)
-	// logrus.Fatal(http.ListenAndServeTLS("0.0.0.0:8001", "./certs/server.crt", "./certs/server.key", nil))
-	l, err := net.Listen("tcp4", addr)
-	if err != nil {
-		log.Fatal(err)
-	}
-	logrus.Fatal(http.ServeTLS(l, nil, "./certs/server.crt", "./certs/server.key"))
-
+	s.Logger.Infoln("starting server on address", s.Address)
+	err = http.ServeTLS(
+		listener,
+		nil,
+		s.TLS.CertPath,
+		s.TLS.KeyPath,
+	)
+	return err
 }
 
-// ServeValidatePods validates an admission request and then writes an admission review to `w`
+// ServeValidate validates an admission request and then writes an admission review response to `w`
 func (s *Server) ServeValidate(w http.ResponseWriter, r *http.Request) {
 
-	var response *admissionv1.AdmissionResponse
+	var admissionResponse admissionv1.AdmissionResponse
 
 	w.Header().Set("Content-Type", "application/json")
 
-	payload, err := getAdmissionReview(r)
+	admissionReview, err := getAdmissionReview(r)
 	if err != nil {
-		logger.Error(err)
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	err = s.Engine.RunNamespacePolicies(payload.Request)
+	err = s.Engine.RunNamespacePolicies(admissionReview.Request)
 	if err != nil {
-		response.Allowed = false
-		response.Result.Message = fmt.Sprintf("%v", err)
-		response.Result.Status = fmt.Sprintf("%v", err)
+		admissionResponse.Allowed = false
+		admissionResponse.Result = &metav1.Status{
+			Message: fmt.Sprintf("%v", err),
+			Status:  fmt.Sprintf("%v", err),
+		}
+	} else {
+		admissionResponse.Allowed = true
 	}
 
-	response.Allowed = true
+	admissionResponse.UID = admissionReview.Request.UID
+	admissionReview.Response = &admissionResponse
 
-	json.NewEncoder(w).Encode(response)
+	json.NewEncoder(w).Encode(admissionReview)
 }
 
 // getAdmissionReview extracts an AdmissionReview from an http.Request if possible

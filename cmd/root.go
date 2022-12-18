@@ -30,9 +30,19 @@ func Execute() error {
 }
 
 func init() {
-	Cmd.Flags().StringP("kubeconfig", "k", "", "Path to the kubeconfig file to run outside of the cluster")
+	Cmd.Flags().StringP("kubeconfig", "k", "", "path to the kubeconfig file to run outside of the cluster")
+	Cmd.Flags().StringP("tls-cert", "p", "/var/ssl/server.crt", "path to the server TLS certificate")
+	Cmd.Flags().StringP("tls-key", "i", "/var/ssl/server.key", "path to the server TLS key")
+	Cmd.Flags().StringP("address", "a", ":8000", "address of the web server")
+	Cmd.Flags().Bool("ipv4", false, "Run web server on ipv4")
 	Cmd.Flags().BoolVarP(&printVersion, "version", "v", false, "Print version of kube-shield")
+
+	// Flags binding
 	viper.BindPFlag("kubeconfig", Cmd.Flags().Lookup("kubeconfig"))
+	viper.BindPFlag("tls-cert", Cmd.Flags().Lookup("tls-cert"))
+	viper.BindPFlag("tls-key", Cmd.Flags().Lookup("tls-key"))
+	viper.BindPFlag("address", Cmd.Flags().Lookup("address"))
+	viper.BindPFlag("ipv4", Cmd.Flags().Lookup("ipv4"))
 }
 
 // Start the admission controller here
@@ -64,12 +74,16 @@ func start(cmd *cobra.Command, args []string) {
 	}
 	index := cache.NewCacheIndex()
 	cachectrl := cache.NewCacheController(dc, index)
-	ng := &engine.Engine{
+	ngin := &engine.Engine{
 		CacheController: cachectrl,
 	}
-	srv := server.Server{
-		Engine: ng,
-	}
+	srv := server.NewServer(
+		viper.GetString("address"),
+		viper.GetString("tls-cert"),
+		viper.GetString("tls-key"),
+		viper.GetBool("ipv4"),
+		ngin,
+	)
 
 	go cachectrl.Run(make(chan struct{}), make(chan struct{}))
 	srv.Start()
