@@ -297,7 +297,7 @@ func (in *Rule) DeepCopyInto(out *Rule) {
 	*out = *in
 	if in.Checks != nil {
 		in, out := &in.Checks, &out.Checks
-		*out = make([]Check, len(*in))
+		*out = make([]*Check, len(*in))
 		copy(*out, *in)
 	}
 }

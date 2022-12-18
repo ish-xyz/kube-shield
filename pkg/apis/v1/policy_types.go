@@ -36,7 +36,7 @@ type Rule struct {
 	// +kubebuilder:validation:Required
 	// +kubebuilder:validation:MaxItems=500
 	// +kubebuilder:validation:MinItems=1
-	Checks []Check `json:"checks"`
+	Checks []*Check `json:"checks"`
 }
 
 // +kubebuilder:object:root=true

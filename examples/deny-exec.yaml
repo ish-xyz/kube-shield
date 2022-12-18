@@ -2,7 +2,7 @@
 apiVersion: kube-shield.red-labs.co.uk/v1
 kind: Policy
 metadata:
-  name: deny-exec-kube-system
+  name: deny-exec
 spec:
   applyOn:
   - verb: connect
@@ -12,9 +12,9 @@ spec:
   rules:
   - name: rule-name
     checks:
-    - field: $_.metadata.namespace
+    - field: $_.namespace
       operator: Equal
-      value: kube-system
+      value: default
 
     # AND
     # - field: $_.input.spec.containers[_].resources.limits.memory

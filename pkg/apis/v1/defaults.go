@@ -25,15 +25,19 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/scheme"
 )
 
+const (
+	// Cluster Policy Kind (string)
+	CLUSTER_POLICY_KIND = "clusterpolicies"
+
+	// Policy Kind (string)
+	POLICY_KIND = "policies"
+
+	DEFAULT_BEHAVIOUR = "IfMatchAllow"
+)
+
 var (
 	// GroupVersion is group version used to register these objects
 	GroupVersion = schema.GroupVersion{Group: "kube-shield.red-labs.co.uk", Version: "v1"}
-
-	// Cluster Policy Kind (string)
-	ClusterPolicyKind = "clusterpolicies"
-
-	// Policy Kind (string)
-	PolicyKind = "policies"
 
 	// SchemeBuilder is used to add go types to the GroupVersionKind scheme
 	SchemeBuilder = &scheme.Builder{GroupVersion: GroupVersion}

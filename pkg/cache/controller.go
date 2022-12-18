@@ -23,13 +23,13 @@ func NewCacheController(clientset dynamic.Interface, c *CacheIndex) *Controller 
 	clusterPolicy := schema.GroupVersionResource{
 		Group:    v1.GroupVersion.Group,
 		Version:  v1.GroupVersion.Version,
-		Resource: v1.ClusterPolicyKind,
+		Resource: v1.CLUSTER_POLICY_KIND,
 	}
 
 	policy := schema.GroupVersionResource{
 		Group:    v1.GroupVersion.Group,
 		Version:  v1.GroupVersion.Version,
-		Resource: v1.PolicyKind,
+		Resource: v1.POLICY_KIND,
 	}
 
 	factory := dynamicinformer.NewFilteredDynamicSharedInformerFactory(clientset, time.Minute, metav1.NamespaceAll, nil)
