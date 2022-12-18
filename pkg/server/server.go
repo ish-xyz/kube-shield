@@ -8,23 +8,10 @@ import (
 	"net"
 	"net/http"
 
-	"github.com/RedLabsPlatform/kube-shield/pkg/engine"
 	"github.com/sirupsen/logrus"
+	"gorm.io/gorm/logger"
 	admissionv1 "k8s.io/api/admission/v1"
 )
-
-type Server struct {
-	Engine *engine.Engine
-}
-
-type ValidatingResponse struct {
-	Response struct {
-		Allowed bool `json:"allowed"`
-		Status  struct {
-			Message string `json:"message"`
-		} `json:"status"`
-	} `json:"response"`
-}
 
 func (s *Server) Start() {
 
@@ -45,8 +32,10 @@ func (s *Server) Start() {
 
 // ServeValidatePods validates an admission request and then writes an admission review to `w`
 func (s *Server) ServeValidate(w http.ResponseWriter, r *http.Request) {
-	logger := logrus.WithField("uri", r.RequestURI)
-	logger.Info("received validation request")
+
+	var response *admissionv1.AdmissionResponse
+
+	w.Header().Set("Content-Type", "application/json")
 
 	payload, err := getAdmissionReview(r)
 	if err != nil {
@@ -57,12 +46,14 @@ func (s *Server) ServeValidate(w http.ResponseWriter, r *http.Request) {
 
 	err = s.Engine.RunNamespacePolicies(payload.Request)
 	if err != nil {
-		w.WriteHeader(500)
-		fmt.Fprint(w, "internal server error")
-		return
+		response.Allowed = false
+		response.Result.Message = fmt.Sprintf("%v", err)
+		response.Result.Status = fmt.Sprintf("%v", err)
 	}
-	w.WriteHeader(500)
-	fmt.Fprint(w, "internal server error")
+
+	response.Allowed = true
+
+	json.NewEncoder(w).Encode(response)
 }
 
 // getAdmissionReview extracts an AdmissionReview from an http.Request if possible
