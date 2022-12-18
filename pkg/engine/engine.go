@@ -13,22 +13,24 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 )
 
-func runChecks(req *admissionv1.AdmissionRequest, desiredMatchResult bool, checks []*v1.Check) (bool, error) {
+// Checks are in AND condition, so if any of the checks don't match the desired result it returns an error
+// Nil error means that the checks have been successful
+func runChecks(req *admissionv1.AdmissionRequest, desiredResult bool, checks []*v1.Check) error {
 
 	for _, check := range checks {
 		jsonReq, err := json.Marshal(req)
 		if err != nil {
-			return false, err
+			return err
 		}
 		checkRes, err := operators.Run(string(jsonReq), check)
-		if checkRes.Match != desiredMatchResult {
-			return checkRes.Match, fmt.Errorf("%s", checkRes.Message)
+		if checkRes.Match != desiredResult {
+			return fmt.Errorf("%s", checkRes.Message)
 		}
 	}
-	return true, nil
+	return nil
 }
 
-func runRules(req *admissionv1.AdmissionRequest, policy *v1.Policy) {
+func runRules(req *admissionv1.AdmissionRequest, policy *v1.Policy) error {
 
 	/*
 		* AllowIfMatch  == AllowIfMatch (default) -> true
@@ -37,16 +39,21 @@ func runRules(req *admissionv1.AdmissionRequest, policy *v1.Policy) {
 		* DenyIfMatch  == AllowIfMatch (default) -> false
 		  (if all checks are false, pass)
 	*/
-	desiredMatchResult := policy.Spec.DefaultBehaviour == v1.DEFAULT_BEHAVIOUR
+	var err error
+	desiredResult := policy.Spec.DefaultBehaviour == v1.DEFAULT_BEHAVIOUR
 
 	for _, rule := range policy.Spec.Rules {
 
-		runChecks(req, desiredMatchResult, rule.Checks)
-
+		err = runChecks(req, desiredResult, rule.Checks)
+		if err != nil {
+			return nil
+		}
 	}
+
+	return fmt.Errorf("all rules on policy '%s' have failed. Last error was: '%v'", policy.Name, err)
 }
 
-func (e *Engine) RunNamespacePolicies(req *admissionv1.AdmissionRequest) {
+func (e *Engine) RunNamespacePolicies(req *admissionv1.AdmissionRequest) error {
 
 	store := e.CacheController.NamespaceInformer.GetStore()
 	verb := cache.Verb(strings.ToLower(string(req.Operation)))
@@ -73,7 +80,12 @@ func (e *Engine) RunNamespacePolicies(req *admissionv1.AdmissionRequest) {
 			continue
 		}
 
-		runRules(req, policy)
+		err = runRules(req, policy)
+		if err != nil {
+			return err
+		}
 
 	}
+
+	return nil
 }

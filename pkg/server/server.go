@@ -17,6 +17,15 @@ type Server struct {
 	Engine *engine.Engine
 }
 
+type ValidatingResponse struct {
+	Response struct {
+		Allowed bool `json:"allowed"`
+		Status  struct {
+			Message string `json:"message"`
+		} `json:"status"`
+	} `json:"response"`
+}
+
 func (s *Server) Start() {
 
 	http.HandleFunc("/validate", s.ServeValidate)
@@ -46,7 +55,12 @@ func (s *Server) ServeValidate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	s.Engine.RunNamespacePolicies(payload.Request)
+	err = s.Engine.RunNamespacePolicies(payload.Request)
+	if err != nil {
+		w.WriteHeader(500)
+		fmt.Fprint(w, "internal server error")
+		return
+	}
 	w.WriteHeader(500)
 	fmt.Fprint(w, "internal server error")
 }
