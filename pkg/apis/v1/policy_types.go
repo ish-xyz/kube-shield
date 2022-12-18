@@ -18,8 +18,8 @@ type PolicyStatus struct {
 }
 
 type PolicySpec struct {
-	// +kubebuilder:default=IfMatchDeny
-	// +kubebuilder:validation:Enum=IfMatchAllow;IfMatchDeny
+	// +kubebuilder:default=AllowIfMatch
+	// +kubebuilder:validation:Enum=AllowIfMatch;DenyIfMatch
 	DefaultBehaviour string `json:"defaultBehaviour"`
 	// +kubebuilder:validation:Required
 	ApplyOn []*Definition `json:"applyOn"`

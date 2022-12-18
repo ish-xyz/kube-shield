@@ -63,11 +63,6 @@ func start(cmd *cobra.Command, args []string) {
 		logrus.Fatal("failed to load kubeconfig")
 	}
 
-	// cert, err := tls.LoadX509KeyPair("/tmp/server.crt", "/tmp/server.key")
-	// if err != nil {
-	// 	logrus.Fatal("failed to load certificates")
-	// }
-
 	dc, err := dynamic.NewForConfig(kubecfg)
 	if err != nil {
 		logrus.Fatal("failed to load Kubernetes dynamic client")

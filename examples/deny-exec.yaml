@@ -8,7 +8,7 @@ spec:
   - verb: connect
     group: ""
     resource: pods/exec 
-  defaultBehaviour: IfMatchDeny
+  defaultBehaviour: DenyIfMatch
   rules:
   - name: rule-name
     checks:
