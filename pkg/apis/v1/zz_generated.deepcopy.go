@@ -298,7 +298,13 @@ func (in *Rule) DeepCopyInto(out *Rule) {
 	if in.Checks != nil {
 		in, out := &in.Checks, &out.Checks
 		*out = make([]*Check, len(*in))
-		copy(*out, *in)
+		for i := range *in {
+			if (*in)[i] != nil {
+				in, out := &(*in)[i], &(*out)[i]
+				*out = new(Check)
+				**out = **in
+			}
+		}
 	}
 }
 

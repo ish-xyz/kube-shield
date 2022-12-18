@@ -49,10 +49,10 @@ spec:
                   type: object
                 type: array
               defaultBehaviour:
-                default: IfMatchDeny
+                default: AllowIfMatch
                 enum:
-                - IfMatchAllow
-                - IfMatchDeny
+                - AllowIfMatch
+                - DenyIfMatch
                 type: string
               rules:
                 items:
