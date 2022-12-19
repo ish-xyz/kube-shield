@@ -1,4 +1,3 @@
-# Allowed operators: Equal, NotEqual, Regex, GreaterThan, LowerThan
 apiVersion: kube-shield.red-labs.co.uk/v1
 kind: Policy
 metadata:
@@ -15,8 +14,3 @@ spec:
     - field: $_.namespace
       operator: Equal
       value: default
-
-    # AND
-    # - field: $_.input.spec.containers[_].resources.limits.memory
-    #   operator: NotEqual
-    #   value: $input.spec.container[_].resources.requests.memory
