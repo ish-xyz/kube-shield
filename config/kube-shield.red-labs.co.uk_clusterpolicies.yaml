@@ -36,23 +36,23 @@ spec:
               applyOn:
                 items:
                   properties:
-                    group:
+                    apiGroup:
                       type: string
                     resource:
                       type: string
                     verb:
                       type: string
                   required:
-                  - group
+                  - apiGroup
                   - resource
                   - verb
                   type: object
                 type: array
               defaultBehaviour:
-                default: IfMatchDeny
+                default: DenyIfMatch
                 enum:
-                - IfMatchAllow
-                - IfMatchDeny
+                - AllowIfMatch
+                - DenyIfMatch
                 type: string
               rules:
                 items:

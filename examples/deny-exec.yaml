@@ -4,9 +4,9 @@ metadata:
   name: deny-exec
 spec:
   applyOn:
-  - verb: connect
-    group: ""
-    resource: pods/exec 
+  - apiGroup: ""
+    resource: "pods/exec"
+    verb: "connect"
   defaultBehaviour: DenyIfMatch
   rules:
   - name: rule-name

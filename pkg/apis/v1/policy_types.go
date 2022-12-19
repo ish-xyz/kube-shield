@@ -49,7 +49,7 @@ type PolicyList struct {
 
 type Definition struct {
 	// +kubebuilder:validation:Required
-	Group string `json:"group"`
+	Group string `json:"apiGroup"`
 	// +kubebuilder:validation:Required
 	Resource string `json:"resource"`
 	// +kubebuilder:validation:Required

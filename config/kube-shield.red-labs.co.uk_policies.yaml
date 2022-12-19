@@ -36,14 +36,14 @@ spec:
               applyOn:
                 items:
                   properties:
-                    group:
+                    apiGroup:
                       type: string
                     resource:
                       type: string
                     verb:
                       type: string
                   required:
-                  - group
+                  - apiGroup
                   - resource
                   - verb
                   type: object
