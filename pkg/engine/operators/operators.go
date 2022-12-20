@@ -25,21 +25,19 @@ func Run(payload string, check *v1.Check) (*v1.CheckResult, error) {
 
 func compare(payload string, check *v1.Check) *v1.CheckResult {
 
-	msg := ""
 	payloadValues := getPayloadValues(check.Field, payload)
 	checkValues := getPolicyValue(check.Value, payload)
 
+	msg := fmt.Sprintf("operator is '%s', fetched value is '%v', defined value is '%s', ", check.Operator, checkValues, payloadValues)
+
 	// if there are no retrieved values and then the check is '== $any' or '!= nil', then fail
 	if (len(payloadValues) == 0) && (checkValues != "" && check.Operator == EQUAL) || (checkValues == "" && check.Operator == NOTEQUAL) {
-		msg = fmt.Sprintf("%s: field: %s returned an empty value, policy has value: %s", check.Operator, check.Field, check.Value)
 		return CreateCheckResult(false, msg)
 	}
 
 	for _, v := range payloadValues {
 
 		val := getTypedPayloadValue(v)
-		msg := fmt.Sprintf("%s: retrieved value '%s' policy defined value: '%s'", check.Operator, val, checkValues)
-
 		if check.Operator == EQUAL && val != checkValues {
 			return CreateCheckResult(false, msg)
 		}
@@ -50,5 +48,5 @@ func compare(payload string, check *v1.Check) *v1.CheckResult {
 
 	}
 
-	return CreateCheckResult(true, fmt.Sprintf("Operator: '%s' -> value '%v' matched with values in list -> '%v'", check.Operator, checkValues, payloadValues))
+	return CreateCheckResult(true, msg)
 }

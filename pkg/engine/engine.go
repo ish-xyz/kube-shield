@@ -51,7 +51,7 @@ func runRules(req *admissionv1.AdmissionRequest, policy *v1.Policy) error {
 		}
 	}
 
-	return fmt.Errorf("\ndenied by policy '%s'. Error: %v", policy.Name, err)
+	return fmt.Errorf("\nDenied by policy '%s'.\nbehaviour is '%s', %v", policy.Name, policy.Spec.DefaultBehaviour, err)
 }
 
 func (e *Engine) RunNamespacePolicies(req *admissionv1.AdmissionRequest) error {
