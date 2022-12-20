@@ -16,14 +16,14 @@ const (
 func Run(payload string, check *v1.Check) (*v1.CheckResult, error) {
 	switch check.Operator {
 	case EQUAL:
-		return compare(payload, check), nil
+		return compare(payload, check)
 	case NOTEQUAL:
-		return compare(payload, check), nil
+		return compare(payload, check)
 	}
 	return nil, fmt.Errorf("unknown operator '%s'", check.Operator)
 }
 
-func compare(payload string, check *v1.Check) *v1.CheckResult {
+func compare(payload string, check *v1.Check) (*v1.CheckResult, error) {
 
 	payloadValues := getPayloadValues(check.Field, payload)
 	checkValues := getPolicyValue(check.Value, payload)
@@ -32,21 +32,21 @@ func compare(payload string, check *v1.Check) *v1.CheckResult {
 
 	// if there are no retrieved values and then the check is '== $any' or '!= nil', then fail
 	if (len(payloadValues) == 0) && (checkValues != "" && check.Operator == EQUAL) || (checkValues == "" && check.Operator == NOTEQUAL) {
-		return CreateCheckResult(false, msg)
+		return CreateCheckResult(false, msg), nil
 	}
 
 	for _, v := range payloadValues {
 
 		val := getTypedPayloadValue(v)
 		if check.Operator == EQUAL && val != checkValues {
-			return CreateCheckResult(false, msg)
+			return CreateCheckResult(false, msg), nil
 		}
 
 		if check.Operator == NOTEQUAL && val == checkValues {
-			return CreateCheckResult(false, msg)
+			return CreateCheckResult(false, msg), nil
 		}
 
 	}
 
-	return CreateCheckResult(true, msg)
+	return CreateCheckResult(true, msg), nil
 }
