@@ -66,7 +66,7 @@ type Check struct {
 
 	// +kubebuilder:validation:Required
 	// +kubebuilder:validation:XPreserveUnknownFields
-	Value interface{} `json:"value"`
+	Value string `json:"value"`
 }
 
 type CheckResult struct {
