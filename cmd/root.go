@@ -80,6 +80,7 @@ func start(cmd *cobra.Command, args []string) {
 		ngin,
 	)
 
+	// TODO: start metrics server
 	go cachectrl.Run(make(chan struct{}), make(chan struct{}))
 	srv.Start()
 }
