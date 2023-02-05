@@ -66,12 +66,13 @@ type Check struct {
 
 	// +kubebuilder:validation:Required
 	// +kubebuilder:validation:XPreserveUnknownFields
-	Value string `json:"value"`
+	Value interface{} `json:"value"`
 }
 
 type CheckResult struct {
-	Match   bool
-	Message string
+	Status int
+	Match  bool
+	Error  error
 }
 
 func init() {

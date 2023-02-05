@@ -9,24 +9,29 @@ import (
 )
 
 const (
+	// Operators
 	GREATER       = "GreaterThan"
 	LOWER         = "LowerThan"
 	EQUAL         = "Equal"
 	NOT_EQUAL     = "NotEqual"
 	EQUAL_ITERATE = "EqualIterate"
+
+	// check statuses
+	CHECK_EXECUTED   = 1
+	CHECK_INIT_ERROR = 2
 )
 
-func Run(payload string, check *v1.Check) (*v1.CheckResult, error) {
+func Run(payload string, check *v1.Check) *v1.CheckResult {
 	switch check.Operator {
 	case EQUAL:
-		equal(payload, check.Field, check.Value)
+		equal(payload, check)
 	}
-	return nil, fmt.Errorf("unknown operator '%s'", check.Operator)
+	return &v1.CheckResult{Match: false, Error: fmt.Errorf("unknown operator '%s'", check.Operator)}
 }
 
-func getPayloadValues(payload, key string) (gjson.Result, error) {
+func getValue(payload, key string) (gjson.Result, error) {
 	if strings.HasPrefix(key, `$_.`) {
 		return gjson.Get(payload, strings.TrimPrefix(key, "$_.")), nil
 	}
-	return gjson.Result{}, fmt.Errorf("not a dynamic json value")
+	return gjson.Result{}, fmt.Errorf("you are trying to retrieve a non-dynamic value")
 }
