@@ -14,15 +14,14 @@ const (
 	NOT_EQUAL     = "NotEqual"
 	GREATER       = "Greater"
 	LOWER         = "Lower"
-	GREATER_EQUAL = "GreaterOrEqual"
-	LOWER_EQUAL   = "LowerOrEqual"
-
+	GREATER_EQUAL = "GreaterEqual"
+	LOWER_EQUAL   = "LowerEqual"
 	// REGEX         = "Regex"
-	//EQUAL_ITERATE = "Iterate"
+	// EQUAL_ITERATE = "Iterate"
 
 	// check statuses
 	CHECK_INIT_ERROR = 1
-	CHECK_OK         = 2
+	CHECK_DONE       = 2
 )
 
 func Run(payload string, check *v1.Check) *v1.CheckResult {
@@ -31,14 +30,14 @@ func Run(payload string, check *v1.Check) *v1.CheckResult {
 		return equal(payload, check)
 	case NOT_EQUAL:
 		return notEqual(payload, check)
-	case GREATER:
-		return greaterThan(payload, check)
-	case GREATER_EQUAL:
-		return greaterOrEqual(payload, check)
-	case LOWER:
-		return lowerThan(payload, check)
-	case LOWER_EQUAL:
-		return lowerOrEqual(payload, check)
+		// case GREATER:
+		// 	return greater(payload, check)
+		// case GREATER_EQUAL:
+		// 	return greaterOrEqual(payload, check)
+		// case LOWER:
+		// 	return lower(payload, check)
+		// case LOWER_EQUAL:
+		// 	return lowerOrEqual(payload, check)
 		// case EQUAL_ITERATE:
 		// 	return equalIterate(payload, check)
 	}

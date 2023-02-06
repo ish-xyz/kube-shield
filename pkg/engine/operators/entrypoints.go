@@ -15,29 +15,29 @@ func notEqual(payload string, check *v1.Check) *v1.CheckResult {
 	return res
 }
 
-func greaterThan(payload string, check *v1.Check) *v1.CheckResult {
-	return compareNumbers(payload, check, false)
-}
+// func lower(payload string, check *v1.Check) *v1.CheckResult {
+// 	return compareNumbers(payload, check, false)
+// }
 
-func lowerThan(payload string, check *v1.Check) *v1.CheckResult {
+// func greater(payload string, check *v1.Check) *v1.CheckResult {
 
-	res := compareNumbers(payload, check, false)
-	res.Match = !res.Match
+// 	res := compareNumbers(payload, check, false)
+// 	res.Match = !res.Match
 
-	return res
-}
+// 	return res
+// }
 
-func greaterOrEqual(payload string, check *v1.Check) *v1.CheckResult {
-	return compareNumbers(payload, check, true)
-}
+// func lowerOrEqual(payload string, check *v1.Check) *v1.CheckResult {
+// 	return compareNumbers(payload, check, true)
+// }
 
-func lowerOrEqual(payload string, check *v1.Check) *v1.CheckResult {
+// func greaterOrEqual(payload string, check *v1.Check) *v1.CheckResult {
 
-	res := compareNumbers(payload, check, true)
-	res.Match = !res.Match
+// 	res := compareNumbers(payload, check, true)
+// 	res.Match = !res.Match
 
-	return res
-}
+// 	return res
+// }
 
 // // entrypoint function for IterateEqual operator
 // func equalIterate(payload string, check *v1.Check) *v1.CheckResult {

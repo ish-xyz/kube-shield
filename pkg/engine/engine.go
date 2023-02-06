@@ -23,7 +23,7 @@ func runChecks(req *admissionv1.AdmissionRequest, desiredResult bool, checks []*
 			return err
 		}
 		checkRes := operators.Run(string(jsonReq), check)
-		if checkRes.Status != operators.CHECK_OK {
+		if checkRes.Status != operators.CHECK_DONE {
 			return fmt.Errorf("check initialisation error: %v", checkRes.Error)
 		}
 		if checkRes.Match != desiredResult {

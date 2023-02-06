@@ -13,7 +13,7 @@ func TestEqualTypeMismatch(t *testing.T) {
 	res := equal(`{"example": [1,2,3]}`, check)
 
 	assert.Equal(t, false, res.Match)
-	assert.Equal(t, CHECK_OK, res.Status)
+	assert.Equal(t, CHECK_DONE, res.Status)
 	assert.NotEmpty(t, res.Error)
 	assert.Equal(t, res.Error, errors.New("type mismatch"))
 }
@@ -22,7 +22,7 @@ func TestEqualTypeMismatchMapArray(t *testing.T) {
 	res := equal(`{"example": {"key":"val"}}`, check)
 
 	assert.Equal(t, false, res.Match)
-	assert.Equal(t, CHECK_OK, res.Status)
+	assert.Equal(t, CHECK_DONE, res.Status)
 	assert.NotEmpty(t, res.Error)
 	assert.Equal(t, res.Error, errors.New("type mismatch"))
 }
@@ -32,7 +32,7 @@ func TestEqualTypeMismatchArrayMap(t *testing.T) {
 	res := equal(`{"example": [1,2,3]}`, check)
 
 	assert.Equal(t, false, res.Match)
-	assert.Equal(t, CHECK_OK, res.Status)
+	assert.Equal(t, CHECK_DONE, res.Status)
 	assert.NotEmpty(t, res.Error)
 	assert.Equal(t, res.Error, errors.New("type mismatch"))
 }
@@ -42,7 +42,7 @@ func TestEqualFail(t *testing.T) {
 	res := equal(`{"example": 2}`, check)
 
 	assert.Equal(t, false, res.Match)
-	assert.Equal(t, CHECK_OK, res.Status)
+	assert.Equal(t, CHECK_DONE, res.Status)
 	assert.NotEmpty(t, res.Error)
 	assert.Equal(t, res.Error, errors.New("different values"))
 }
@@ -52,7 +52,7 @@ func TestEqualNumber(t *testing.T) {
 	res := equal(`{"example": 1}`, check)
 
 	assert.Equal(t, true, res.Match)
-	assert.Equal(t, CHECK_OK, res.Status)
+	assert.Equal(t, CHECK_DONE, res.Status)
 	assert.NotEmpty(t, res.Error)
 }
 
@@ -61,7 +61,7 @@ func TestEqualBool(t *testing.T) {
 	res := equal(`{"example": true}`, check)
 
 	assert.Equal(t, true, res.Match)
-	assert.Equal(t, CHECK_OK, res.Status)
+	assert.Equal(t, CHECK_DONE, res.Status)
 	assert.NotEmpty(t, res.Error)
 }
 
@@ -70,7 +70,7 @@ func TestEqualString(t *testing.T) {
 	res := equal(`{"example": "true"}`, check)
 
 	assert.Equal(t, true, res.Match)
-	assert.Equal(t, CHECK_OK, res.Status)
+	assert.Equal(t, CHECK_DONE, res.Status)
 	assert.NotEmpty(t, res.Error)
 }
 
@@ -79,7 +79,7 @@ func TestEqualRaw(t *testing.T) {
 	res := equal(`{"example": null}`, check)
 
 	assert.Equal(t, true, res.Match)
-	assert.Equal(t, CHECK_OK, res.Status)
+	assert.Equal(t, CHECK_DONE, res.Status)
 	assert.NotEmpty(t, res.Error)
 }
 
@@ -88,7 +88,7 @@ func TestEqualArray(t *testing.T) {
 	res := equal(`{"example": [1,2,3]}`, check)
 
 	assert.Equal(t, true, res.Match)
-	assert.Equal(t, CHECK_OK, res.Status)
+	assert.Equal(t, CHECK_DONE, res.Status)
 	assert.NotEmpty(t, res.Error)
 }
 
@@ -97,7 +97,7 @@ func TestEqualCountArray(t *testing.T) {
 	res := equal(`{"example": [1,2,3]}`, check)
 
 	assert.Equal(t, true, res.Match)
-	assert.Equal(t, CHECK_OK, res.Status)
+	assert.Equal(t, CHECK_DONE, res.Status)
 	assert.NotEmpty(t, res.Error)
 }
 
@@ -106,7 +106,7 @@ func TestEqualMapKeysArray(t *testing.T) {
 	res := equal(`{"example": [{"key":"val1"}, {"key":"val2"}, {"key":"val3"}]}`, check)
 
 	assert.Equal(t, true, res.Match)
-	assert.Equal(t, CHECK_OK, res.Status)
+	assert.Equal(t, CHECK_DONE, res.Status)
 	assert.NotEmpty(t, res.Error)
 }
 
@@ -115,7 +115,7 @@ func TestEqualArrayFail(t *testing.T) {
 	res := equal(`{"example": [1,2,3]}`, check)
 
 	assert.Equal(t, false, res.Match)
-	assert.Equal(t, CHECK_OK, res.Status)
+	assert.Equal(t, CHECK_DONE, res.Status)
 	assert.NotEmpty(t, res.Error)
 }
 
@@ -124,7 +124,7 @@ func TestEqualArrayTypeMismatch(t *testing.T) {
 	res := equal(`{"example": ["1","2","3"]}`, check)
 
 	assert.Equal(t, false, res.Match)
-	assert.Equal(t, CHECK_OK, res.Status)
+	assert.Equal(t, CHECK_DONE, res.Status)
 	assert.NotEmpty(t, res.Error)
 }
 
@@ -133,7 +133,7 @@ func TestEqualArrayDifferentLen(t *testing.T) {
 	res := equal(`{"example": [1,2]}`, check)
 
 	assert.Equal(t, false, res.Match)
-	assert.Equal(t, CHECK_OK, res.Status)
+	assert.Equal(t, CHECK_DONE, res.Status)
 	assert.NotEmpty(t, res.Error)
 }
 
@@ -142,7 +142,7 @@ func TestEqualOKMap(t *testing.T) {
 	res := equal(`{"example": {"key":"val", "nokey":"noval"}}`, check)
 
 	assert.Equal(t, true, res.Match)
-	assert.Equal(t, CHECK_OK, res.Status)
+	assert.Equal(t, CHECK_DONE, res.Status)
 	assert.NotEmpty(t, res.Error)
 }
 
@@ -153,7 +153,7 @@ func TestEqualOKNestedMap(t *testing.T) {
 	res := equal(payload, check)
 
 	assert.Equal(t, true, res.Match)
-	assert.Equal(t, CHECK_OK, res.Status)
+	assert.Equal(t, CHECK_DONE, res.Status)
 	assert.NotEmpty(t, res.Error)
 }
 
@@ -163,7 +163,7 @@ func TestEqualMapWrongKey(t *testing.T) {
 	res := equal(payload, check)
 
 	assert.Equal(t, false, res.Match)
-	assert.Equal(t, CHECK_OK, res.Status)
+	assert.Equal(t, CHECK_DONE, res.Status)
 	assert.Equal(t, res.Error, errors.New("different values"))
 }
 

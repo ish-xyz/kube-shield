@@ -105,7 +105,7 @@ func compareSimple(expected, actual gjson.Result) bool {
 	return false
 }
 
-func compareNumbers(payload string, check *v1.Check, considerEqual bool) *v1.CheckResult {
+func compareNumbers(payload string, check *v1.Check) *v1.CheckResult {
 
 	// Initialisation
 	res := &v1.CheckResult{Status: CHECK_INIT_ERROR, Match: false, Error: fmt.Errorf("init error")}
@@ -124,28 +124,14 @@ func compareNumbers(payload string, check *v1.Check, considerEqual bool) *v1.Che
 	}
 
 	// Check processesing
-	res.Status = CHECK_OK
+	res.Status = CHECK_DONE
 
 	if actual.Type != gjson.Number || expected.Type != gjson.Number {
 		res.Error = errors.New("not a number")
 		return res
 	}
 
-	if expected.Float() > actual.Float() {
-		res.Match = true
-		res.Error = fmt.Errorf("expected value '%f' greater than '%f'", expected.Float(), actual.Float())
-	} else if expected.Float() >= actual.Float() && considerEqual {
-		res.Match = true
-		res.Error = fmt.Errorf("expected value '%f' greater or equal to '%f'", expected.Float(), actual.Float())
-	} else if expected.Float() < actual.Float() {
-		res.Match = false
-		res.Error = fmt.Errorf("expected value '%f' lower than '%f'", expected.Float(), actual.Float())
-	} else if expected.Float() <= actual.Float() && considerEqual {
-		res.Match = false
-		res.Error = fmt.Errorf("expected value '%f' lower or equal to '%f'", expected.Float(), actual.Float())
-	}
-
-	return res
+	return nil
 }
 
 // function to run both Equal and NotEqual operator
@@ -172,7 +158,7 @@ func compareValues(payload string, check *v1.Check) *v1.CheckResult {
 	}
 
 	// Check processesing
-	res.Status = CHECK_OK
+	res.Status = CHECK_DONE
 	if match := compareTypes(expected, actual); !match {
 		res.Error = errors.New("type mismatch")
 		return res

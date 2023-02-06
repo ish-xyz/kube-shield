@@ -13,7 +13,7 @@ func TestNotEqualTypeMismatch(t *testing.T) {
 	res := notEqual(`{"example": [1,2,3]}`, check)
 
 	assert.Equal(t, true, res.Match)
-	assert.Equal(t, CHECK_OK, res.Status)
+	assert.Equal(t, CHECK_DONE, res.Status)
 	assert.NotEmpty(t, res.Error)
 	assert.Equal(t, res.Error, errors.New("type mismatch"))
 }
@@ -23,7 +23,7 @@ func TestNotEqualTypeMismatchMapArray(t *testing.T) {
 	res := notEqual(`{"example": {"key":"val"}}`, check)
 
 	assert.Equal(t, true, res.Match)
-	assert.Equal(t, CHECK_OK, res.Status)
+	assert.Equal(t, CHECK_DONE, res.Status)
 	assert.NotEmpty(t, res.Error)
 	assert.Equal(t, res.Error, errors.New("type mismatch"))
 }
@@ -33,7 +33,7 @@ func TestNotEqualTypeMismatchArrayMap(t *testing.T) {
 	res := notEqual(`{"example": [1,2,3]}`, check)
 
 	assert.Equal(t, true, res.Match)
-	assert.Equal(t, CHECK_OK, res.Status)
+	assert.Equal(t, CHECK_DONE, res.Status)
 	assert.NotEmpty(t, res.Error)
 	assert.Equal(t, res.Error, errors.New("type mismatch"))
 }
@@ -43,7 +43,7 @@ func TestNotEqualFail(t *testing.T) {
 	res := notEqual(`{"example": 2}`, check)
 
 	assert.Equal(t, true, res.Match)
-	assert.Equal(t, CHECK_OK, res.Status)
+	assert.Equal(t, CHECK_DONE, res.Status)
 	assert.NotEmpty(t, res.Error)
 	assert.Equal(t, res.Error, errors.New("different values"))
 }
@@ -53,7 +53,7 @@ func TestNotEqualKNumber(t *testing.T) {
 	res := notEqual(`{"example": 1}`, check)
 
 	assert.Equal(t, false, res.Match)
-	assert.Equal(t, CHECK_OK, res.Status)
+	assert.Equal(t, CHECK_DONE, res.Status)
 	assert.NotEmpty(t, res.Error)
 }
 
@@ -62,7 +62,7 @@ func TestNotEqualBool(t *testing.T) {
 	res := notEqual(`{"example": true}`, check)
 
 	assert.Equal(t, false, res.Match)
-	assert.Equal(t, CHECK_OK, res.Status)
+	assert.Equal(t, CHECK_DONE, res.Status)
 	assert.NotEmpty(t, res.Error)
 }
 
@@ -71,7 +71,7 @@ func TestNotEqualString(t *testing.T) {
 	res := notEqual(`{"example": "true"}`, check)
 
 	assert.Equal(t, false, res.Match)
-	assert.Equal(t, CHECK_OK, res.Status)
+	assert.Equal(t, CHECK_DONE, res.Status)
 	assert.NotEmpty(t, res.Error)
 }
 
@@ -80,7 +80,7 @@ func TestNotEqualRaw(t *testing.T) {
 	res := notEqual(`{"example": null}`, check)
 
 	assert.Equal(t, false, res.Match)
-	assert.Equal(t, CHECK_OK, res.Status)
+	assert.Equal(t, CHECK_DONE, res.Status)
 	assert.NotEmpty(t, res.Error)
 }
 
@@ -89,7 +89,7 @@ func TestNotEqualArray(t *testing.T) {
 	res := notEqual(`{"example": [1,2,3]}`, check)
 
 	assert.Equal(t, false, res.Match)
-	assert.Equal(t, CHECK_OK, res.Status)
+	assert.Equal(t, CHECK_DONE, res.Status)
 	assert.NotEmpty(t, res.Error)
 }
 
@@ -98,7 +98,7 @@ func TestNotEqualCountArray(t *testing.T) {
 	res := notEqual(`{"example": [1,2,3]}`, check)
 
 	assert.Equal(t, false, res.Match)
-	assert.Equal(t, CHECK_OK, res.Status)
+	assert.Equal(t, CHECK_DONE, res.Status)
 	assert.NotEmpty(t, res.Error)
 }
 
@@ -107,7 +107,7 @@ func TestNotEqualMapKeysArray(t *testing.T) {
 	res := notEqual(`{"example": [{"key":"val1"}, {"key":"val2"}, {"key":"val3"}]}`, check)
 
 	assert.Equal(t, false, res.Match)
-	assert.Equal(t, CHECK_OK, res.Status)
+	assert.Equal(t, CHECK_DONE, res.Status)
 	assert.NotEmpty(t, res.Error)
 }
 
@@ -116,7 +116,7 @@ func TestNotEqualArrayTypeMismatch(t *testing.T) {
 	res := notEqual(`{"example": ["1","2","3"]}`, check)
 
 	assert.Equal(t, true, res.Match)
-	assert.Equal(t, CHECK_OK, res.Status)
+	assert.Equal(t, CHECK_DONE, res.Status)
 	assert.NotEmpty(t, res.Error)
 }
 
@@ -125,7 +125,7 @@ func TestNotEqualArrayDifferentLen(t *testing.T) {
 	res := notEqual(`{"example": [1,2]}`, check)
 
 	assert.Equal(t, true, res.Match)
-	assert.Equal(t, CHECK_OK, res.Status)
+	assert.Equal(t, CHECK_DONE, res.Status)
 	assert.NotEmpty(t, res.Error)
 }
 
@@ -134,7 +134,7 @@ func TestNotEqualMap(t *testing.T) {
 	res := notEqual(`{"example": {"key":"val", "nokey":"noval"}}`, check)
 
 	assert.Equal(t, false, res.Match)
-	assert.Equal(t, CHECK_OK, res.Status)
+	assert.Equal(t, CHECK_DONE, res.Status)
 	assert.NotEmpty(t, res.Error)
 }
 
@@ -145,7 +145,7 @@ func TestNotEqualNestedMap(t *testing.T) {
 	res := notEqual(payload, check)
 
 	assert.Equal(t, false, res.Match)
-	assert.Equal(t, CHECK_OK, res.Status)
+	assert.Equal(t, CHECK_DONE, res.Status)
 	assert.NotEmpty(t, res.Error)
 }
 
@@ -155,7 +155,7 @@ func TestNotEqualMapWrongKey(t *testing.T) {
 	res := notEqual(payload, check)
 
 	assert.Equal(t, true, res.Match)
-	assert.Equal(t, CHECK_OK, res.Status)
+	assert.Equal(t, CHECK_DONE, res.Status)
 	assert.Equal(t, res.Error, errors.New("different values"))
 }
 
