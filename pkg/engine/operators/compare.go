@@ -9,6 +9,7 @@ import (
 	"github.com/tidwall/gjson"
 )
 
+// compare types of two gjson.Result objects
 func compareTypes(expected, actual gjson.Result) bool {
 
 	if expected.Type != actual.Type {
@@ -28,6 +29,7 @@ func compareTypes(expected, actual gjson.Result) bool {
 	return true
 }
 
+// compare complex results -> map/key
 func compareComplex(expected, actual gjson.Result) bool {
 
 	if expected.Type != gjson.JSON {
@@ -85,6 +87,7 @@ func compareComplex(expected, actual gjson.Result) bool {
 	return true
 }
 
+// Compare basic, non-complex, results
 func compareSimple(expected, actual gjson.Result) bool {
 
 	switch atype := expected.Type; atype {
@@ -102,8 +105,49 @@ func compareSimple(expected, actual gjson.Result) bool {
 	return false
 }
 
-// Running Equal operators
-func equal(payload string, check *v1.Check) *v1.CheckResult {
+func compareNumbers(payload string, check *v1.Check) *v1.CheckResult {
+
+	// Initialisation
+	res := &v1.CheckResult{Status: CHECK_INIT_ERROR, Match: false, Error: fmt.Errorf("init error")}
+
+	checkJson, err := json.Marshal(check)
+	if err != nil {
+		res.Error = errors.New("failed to initialise check json data")
+		return res
+	}
+
+	expected, _ := getValue(string(checkJson), "$_.value")
+	actual, err := getValue(payload, check.Field)
+	if err != nil {
+		res.Error = err
+		return res
+	}
+
+	// Check processesing
+	res.Status = CHECK_OK
+
+	if actual.Type != gjson.Number || expected.Type != gjson.Number {
+		res.Error = errors.New("not a number")
+		return res
+	}
+
+	if expected.Float() > actual.Float() {
+		res.Match = true
+		res.Error = fmt.Errorf("expected value '%f' greater than '%f'", expected.Float(), actual.Float())
+	} else {
+		res.Match = false
+		res.Error = fmt.Errorf("expected value '%f' lower than '%f'", expected.Float(), actual.Float())
+	}
+
+	return nil
+}
+
+// function to run both Equal and NotEqual operator
+// pass payload as JSON string value and use behaviour to switch between the two operators
+// behaviour:
+// -> true == Equal
+// -> false == NotEqual
+func compareValues(payload string, check *v1.Check) *v1.CheckResult {
 
 	// Initialisation
 	res := &v1.CheckResult{Status: CHECK_INIT_ERROR, Match: false, Error: fmt.Errorf("init error")}
