@@ -28,6 +28,22 @@ func TestEqualOK(t *testing.T) {
 	assert.NotEmpty(t, res.Error)
 }
 
+func TestEqualOKArray(t *testing.T) {
+	check := &v1.Check{Field: "$_.example", Value: []int{1, 2, 3}}
+	res := equal(`{"example": [1,2,3]}`, check)
+	assert.Equal(t, true, res.Match)
+	assert.Equal(t, CHECK_EXECUTED, res.Status)
+	assert.NotEmpty(t, res.Error)
+}
+
+func TestEqualOKMap(t *testing.T) {
+	check := &v1.Check{Field: "$_.example", Value: map[string]string{"key": "val", "nokey": "noval"}}
+	res := equal(`{"example": {"key":"val", "nokey":"noval"}}`, check)
+	assert.Equal(t, true, res.Match)
+	assert.Equal(t, CHECK_EXECUTED, res.Status)
+	assert.NotEmpty(t, res.Error)
+}
+
 func TestEqualInitError(t *testing.T) {
 	res := equal(`{"example": 1}`, &v1.Check{Field: "1", Value: 1})
 	assert.Equal(t, false, res.Match)
