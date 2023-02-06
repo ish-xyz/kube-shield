@@ -33,10 +33,12 @@ func Run(payload string, check *v1.Check) *v1.CheckResult {
 		return equal(payload, check)
 	case NOT_EQUAL:
 		return notEqual(payload, check)
-	case EQUAL_ITERATE:
-		return equalIterate(payload, check)
+	// case EQUAL_ITERATE:
+	// 	return equalIterate(payload, check)
 	case GREATER_THAN:
 		return greaterThan(payload, check)
+	case LOWER_THAN:
+		return lowerThan(payload, check)
 	}
 	return &v1.CheckResult{Match: false, Error: fmt.Errorf("unknown operator '%s'", check.Operator)}
 }
