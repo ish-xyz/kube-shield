@@ -44,13 +44,13 @@ func TestEqualCountArray(t *testing.T) {
 	assert.NotEmpty(t, res.Error)
 }
 
-// func TestEqualMapKeysArray(t *testing.T) {
-// 	check := &v1.Check{Field: `$_.example[_]["key"]`, Value: []string{"val1", "val2", "val3"}}
-// 	res := equal(`{"example": [{"key":"val1"}, {"key":"val2"}, {"key":"val3"}]}`, check)
-// 	assert.Equal(t, true, res.Match)
-// 	assert.Equal(t, CHECK_OK, res.Status)
-// 	assert.NotEmpty(t, res.Error)
-// }
+func TestEqualMapKeysArray(t *testing.T) {
+	check := &v1.Check{Field: `$_.example.#.key`, Value: []string{"val1", "val2", "val3"}}
+	res := equal(`{"example": [{"key":"val1"}, {"key":"val2"}, {"key":"val3"}]}`, check)
+	assert.Equal(t, true, res.Match)
+	assert.Equal(t, CHECK_OK, res.Status)
+	assert.NotEmpty(t, res.Error)
+}
 
 func TestEqualArrayTypeMismatch(t *testing.T) {
 	check := &v1.Check{Field: "$_.example", Value: []int{1, 2, 3}}
