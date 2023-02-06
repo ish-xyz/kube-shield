@@ -16,12 +16,24 @@ func notEqual(payload string, check *v1.Check) *v1.CheckResult {
 }
 
 func greaterThan(payload string, check *v1.Check) *v1.CheckResult {
-	return compareNumbers(payload, check)
+	return compareNumbers(payload, check, false)
 }
 
 func lowerThan(payload string, check *v1.Check) *v1.CheckResult {
 
-	res := compareNumbers(payload, check)
+	res := compareNumbers(payload, check, false)
+	res.Match = !res.Match
+
+	return res
+}
+
+func greaterOrEqual(payload string, check *v1.Check) *v1.CheckResult {
+	return compareNumbers(payload, check, true)
+}
+
+func lowerOrEqual(payload string, check *v1.Check) *v1.CheckResult {
+
+	res := compareNumbers(payload, check, true)
 	res.Match = !res.Match
 
 	return res

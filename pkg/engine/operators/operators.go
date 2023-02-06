@@ -10,21 +10,19 @@ import (
 
 const (
 	// Operators
-	GREATER_THAN  = "GreaterThan"
-	LOWER_THAN    = "LowerThan"
 	EQUAL         = "Equal"
 	NOT_EQUAL     = "NotEqual"
-	EQUAL_ITERATE = "EqualIterate"
+	GREATER       = "Greater"
+	LOWER         = "Lower"
+	GREATER_EQUAL = "GreaterOrEqual"
+	LOWER_EQUAL   = "LowerOrEqual"
+
+	// REGEX         = "Regex"
+	//EQUAL_ITERATE = "Iterate"
 
 	// check statuses
 	CHECK_INIT_ERROR = 1
 	CHECK_OK         = 2
-
-	// behaviours
-	RUN_EQUAL        = true
-	RUN_NOT_EQUAL    = false
-	RUN_GREATER_THAN = true
-	RUN_LOWER_THAN   = false
 )
 
 func Run(payload string, check *v1.Check) *v1.CheckResult {
@@ -33,12 +31,16 @@ func Run(payload string, check *v1.Check) *v1.CheckResult {
 		return equal(payload, check)
 	case NOT_EQUAL:
 		return notEqual(payload, check)
-	// case EQUAL_ITERATE:
-	// 	return equalIterate(payload, check)
-	case GREATER_THAN:
+	case GREATER:
 		return greaterThan(payload, check)
-	case LOWER_THAN:
+	case GREATER_EQUAL:
+		return greaterOrEqual(payload, check)
+	case LOWER:
 		return lowerThan(payload, check)
+	case LOWER_EQUAL:
+		return lowerOrEqual(payload, check)
+		// case EQUAL_ITERATE:
+		// 	return equalIterate(payload, check)
 	}
 	return &v1.CheckResult{Match: false, Error: fmt.Errorf("unknown operator '%s'", check.Operator)}
 }

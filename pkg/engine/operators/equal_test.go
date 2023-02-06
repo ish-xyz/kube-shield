@@ -47,7 +47,7 @@ func TestEqualFail(t *testing.T) {
 	assert.Equal(t, res.Error, errors.New("different values"))
 }
 
-func TestEqualKNumber(t *testing.T) {
+func TestEqualNumber(t *testing.T) {
 	check := &v1.Check{Field: "$_.example", Value: 1}
 	res := equal(`{"example": 1}`, check)
 
@@ -106,6 +106,15 @@ func TestEqualMapKeysArray(t *testing.T) {
 	res := equal(`{"example": [{"key":"val1"}, {"key":"val2"}, {"key":"val3"}]}`, check)
 
 	assert.Equal(t, true, res.Match)
+	assert.Equal(t, CHECK_OK, res.Status)
+	assert.NotEmpty(t, res.Error)
+}
+
+func TestEqualArrayFail(t *testing.T) {
+	check := &v1.Check{Field: "$_.example", Value: []int{1, 4, 3}}
+	res := equal(`{"example": [1,2,3]}`, check)
+
+	assert.Equal(t, false, res.Match)
 	assert.Equal(t, CHECK_OK, res.Status)
 	assert.NotEmpty(t, res.Error)
 }
