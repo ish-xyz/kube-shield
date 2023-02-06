@@ -17,8 +17,8 @@ const (
 	EQUAL_ITERATE = "EqualIterate"
 
 	// check statuses
-	CHECK_EXECUTED   = 1
-	CHECK_INIT_ERROR = 2
+	CHECK_INIT_ERROR = 1
+	CHECK_OK         = 2
 )
 
 func Run(payload string, check *v1.Check) *v1.CheckResult {

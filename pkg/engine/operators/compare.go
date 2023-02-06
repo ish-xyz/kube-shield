@@ -123,15 +123,19 @@ func equal(payload string, check *v1.Check) *v1.CheckResult {
 		return res
 	}
 
-	// Check processesing
-	res.Status = CHECK_EXECUTED
+	fmt.Println(expected, actual)
 
+	// Check processesing
+	res.Status = CHECK_OK
 	if match := compareTypes(expected, actual); !match {
 		res.Error = errors.New("type mismatch")
 		return res
 	}
 
 	res.Match = compareComplex(expected, actual)
+	if !res.Match {
+		res.Error = fmt.Errorf("different values")
+	}
 
 	return res
 }
