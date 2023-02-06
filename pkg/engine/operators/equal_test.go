@@ -1,6 +1,7 @@
 package operators
 
 import (
+	"errors"
 	"testing"
 
 	v1 "github.com/RedLabsPlatform/kube-shield/pkg/apis/v1"
@@ -12,6 +13,22 @@ func TestEqualTypeMismatch(t *testing.T) {
 	assert.Equal(t, false, res.Match)
 	assert.Equal(t, CHECK_OK, res.Status)
 	assert.NotEmpty(t, res.Error)
+	assert.Equal(t, res.Error, errors.New("type mismatch"))
+}
+func TestEqualTypeMismatchMapArray(t *testing.T) {
+	res := equal(`{"example": {"key":"val"}}`, &v1.Check{Field: "$_.example", Value: []int{1, 2, 3}})
+	assert.Equal(t, false, res.Match)
+	assert.Equal(t, CHECK_OK, res.Status)
+	assert.NotEmpty(t, res.Error)
+	assert.Equal(t, res.Error, errors.New("type mismatch"))
+}
+
+func TestEqualTypeMismatchArrayMap(t *testing.T) {
+	res := equal(`{"example": [1,2,3]}`, &v1.Check{Field: "$_.example", Value: map[string]interface{}{"key": "val"}})
+	assert.Equal(t, false, res.Match)
+	assert.Equal(t, CHECK_OK, res.Status)
+	assert.NotEmpty(t, res.Error)
+	assert.Equal(t, res.Error, errors.New("type mismatch"))
 }
 
 func TestEqualFail(t *testing.T) {
@@ -19,6 +36,7 @@ func TestEqualFail(t *testing.T) {
 	assert.Equal(t, false, res.Match)
 	assert.Equal(t, CHECK_OK, res.Status)
 	assert.NotEmpty(t, res.Error)
+	assert.Equal(t, res.Error, errors.New("different values"))
 }
 
 func TestEqualOK(t *testing.T) {
@@ -76,8 +94,28 @@ func TestEqualOKMap(t *testing.T) {
 	assert.NotEmpty(t, res.Error)
 }
 
+func TestEqualOKNestedMap(t *testing.T) {
+	payload := `{"example": {"key": {"subkey": "subval"}, "key2": {"subkey2":"subval2"}}}`
+	expected := map[string]interface{}{"key": map[string]interface{}{"subkey": "subval"}, "key2": map[string]interface{}{"subkey2": "subval2"}}
+	check := &v1.Check{Field: "$_.example", Value: expected}
+	res := equal(payload, check)
+	assert.Equal(t, true, res.Match)
+	assert.Equal(t, CHECK_OK, res.Status)
+	assert.NotEmpty(t, res.Error)
+}
+
+func TestEqualMapWrongKey(t *testing.T) {
+	payload := `{"example": {"wrong-key": "my-custom-value"}}`
+	check := &v1.Check{Field: "$_.example", Value: map[string]interface{}{"key": "my-custom-value"}}
+	res := equal(payload, check)
+	assert.Equal(t, false, res.Match)
+	assert.Equal(t, CHECK_OK, res.Status)
+	assert.Equal(t, res.Error, errors.New("different values"))
+}
+
 func TestEqualInitError(t *testing.T) {
-	res := equal(`{"example": 1}`, &v1.Check{Field: "1", Value: 1})
+	check := &v1.Check{Field: "KEY_PATH_WITHOUT_PREFIX_$_.", Value: 1}
+	res := equal(`{"example": 1}`, check)
 	assert.Equal(t, false, res.Match)
 	assert.Equal(t, CHECK_INIT_ERROR, res.Status)
 	assert.NotEmpty(t, res.Error)

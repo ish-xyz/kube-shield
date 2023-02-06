@@ -30,8 +30,6 @@ func compareTypes(expected, actual gjson.Result) bool {
 
 func compareComplex(expected, actual gjson.Result) bool {
 
-	fmt.Printf("comparing %s AND %s", expected.Raw, actual.Raw)
-
 	if expected.Type != gjson.JSON {
 		return compareSimple(expected, actual)
 	}
@@ -122,8 +120,6 @@ func equal(payload string, check *v1.Check) *v1.CheckResult {
 		res.Error = err
 		return res
 	}
-
-	fmt.Println(expected, actual)
 
 	// Check processesing
 	res.Status = CHECK_OK
