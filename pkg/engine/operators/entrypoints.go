@@ -23,9 +23,11 @@ func notEqual(payload string, check *v1.Check) *v1.CheckResult {
 	}
 }
 
-// func lower(payload string, check *v1.Check) *v1.CheckResult {
-// 	return compareNumbers(payload, check, false)
-// }
+func lower(payload string, check *v1.Check) *v1.CheckResult {
+
+	compareNumbers(payload, check)
+	return nil
+}
 
 // func greater(payload string, check *v1.Check) *v1.CheckResult {
 
