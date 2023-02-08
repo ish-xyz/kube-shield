@@ -21,7 +21,7 @@ const (
 
 	// check statuses
 	CHECK_INIT_ERROR = 1
-	CHECK_DONE       = 2
+	CHECK_EXECUTED   = 2
 )
 
 func Run(payload string, check *v1.Check) *v1.CheckResult {
@@ -41,7 +41,7 @@ func Run(payload string, check *v1.Check) *v1.CheckResult {
 		// case EQUAL_ITERATE:
 		// 	return equalIterate(payload, check)
 	}
-	return &v1.CheckResult{Match: false, Error: fmt.Errorf("unknown operator '%s'", check.Operator)}
+	return &v1.CheckResult{Result: false, Error: fmt.Errorf("unknown operator '%s'", check.Operator), Message: ""}
 }
 
 func getValue(payload, key string) (gjson.Result, error) {

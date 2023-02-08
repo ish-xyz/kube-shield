@@ -70,9 +70,9 @@ type Check struct {
 }
 
 type CheckResult struct {
-	Status int
-	Match  bool
-	Error  error
+	Message string
+	Result  bool
+	Error   error
 }
 
 func init() {

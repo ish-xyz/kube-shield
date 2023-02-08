@@ -8,6 +8,7 @@ import (
 	v1 "github.com/RedLabsPlatform/kube-shield/pkg/apis/v1"
 	"github.com/RedLabsPlatform/kube-shield/pkg/cache"
 	"github.com/RedLabsPlatform/kube-shield/pkg/engine/operators"
+	"github.com/sirupsen/logrus"
 	admissionv1 "k8s.io/api/admission/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -23,10 +24,11 @@ func runChecks(req *admissionv1.AdmissionRequest, desiredResult bool, checks []*
 			return err
 		}
 		checkRes := operators.Run(string(jsonReq), check)
-		if checkRes.Status != operators.CHECK_DONE {
-			return fmt.Errorf("check initialisation error: %v", checkRes.Error)
+		if checkRes.Error != nil {
+			logrus.Errorf("engine failed while executing check %v", checkRes.Error)
+			return fmt.Errorf("engine failed while executing check %v", checkRes.Error)
 		}
-		if checkRes.Match != desiredResult {
+		if checkRes.Result != desiredResult {
 			return checkRes.Error
 		}
 	}

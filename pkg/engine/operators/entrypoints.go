@@ -4,15 +4,23 @@ import v1 "github.com/RedLabsPlatform/kube-shield/pkg/apis/v1"
 
 // entrypoint function for Equal operator
 func equal(payload string, check *v1.Check) *v1.CheckResult {
-	return compareValues(payload, check)
+	equal, msg, err := compareValues(payload, check)
+	return &v1.CheckResult{
+		Result:  equal,
+		Message: msg,
+		Error:   err,
+	}
 }
 
 // entrypoint function for NotEqual operator
 func notEqual(payload string, check *v1.Check) *v1.CheckResult {
-	res := compareValues(payload, check)
-	res.Match = !res.Match
+	equal, msg, err := compareValues(payload, check)
 
-	return res
+	return &v1.CheckResult{
+		Result:  !equal,
+		Message: msg,
+		Error:   err,
+	}
 }
 
 // func lower(payload string, check *v1.Check) *v1.CheckResult {

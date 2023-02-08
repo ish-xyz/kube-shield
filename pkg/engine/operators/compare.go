@@ -2,7 +2,6 @@ package operators
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 
 	v1 "github.com/RedLabsPlatform/kube-shield/pkg/apis/v1"
@@ -105,69 +104,52 @@ func compareSimple(expected, actual gjson.Result) bool {
 	return false
 }
 
-func compareNumbers(payload string, check *v1.Check) *v1.CheckResult {
-
-	// Initialisation
-	res := &v1.CheckResult{Status: CHECK_INIT_ERROR, Match: false, Error: fmt.Errorf("init error")}
+// function to compare 2 gjson.Result numbers
+// returns => isEqual (bool), message (string), executionErrors (error)
+func compareNumbers(payload string, check *v1.Check) (bool, string, error) {
 
 	checkJson, err := json.Marshal(check)
 	if err != nil {
-		res.Error = errors.New("failed to initialise check json data")
-		return res
+		return false, "", fmt.Errorf("init error")
 	}
 
 	expected, _ := getValue(string(checkJson), "$_.value")
 	actual, err := getValue(payload, check.Field)
 	if err != nil {
-		res.Error = err
-		return res
+		return false, "", fmt.Errorf("failed to get values from payload")
 	}
 
 	// Check processesing
-	res.Status = CHECK_DONE
-
 	if actual.Type != gjson.Number || expected.Type != gjson.Number {
-		res.Error = errors.New("not a number")
-		return res
+		return false, "values passed are not numbers", nil
 	}
 
-	return nil
+	return true, "", nil
 }
 
-// function to run both Equal and NotEqual operator
-// pass payload as JSON string value and use behaviour to switch between the two operators
-// behaviour:
-// -> true == Equal
-// -> false == NotEqual
-func compareValues(payload string, check *v1.Check) *v1.CheckResult {
-
-	// Initialisation
-	res := &v1.CheckResult{Status: CHECK_INIT_ERROR, Match: false, Error: fmt.Errorf("init error")}
+// function to compare 2 gjson.Result
+// returns => isEqual (bool), message (string), executionErrors (error)
+func compareValues(payload string, check *v1.Check) (bool, string, error) {
 
 	checkJson, err := json.Marshal(check)
 	if err != nil {
-		res.Error = errors.New("failed to initialise check json data")
-		return res
+		return false, "", fmt.Errorf("init error")
 	}
 
 	expected, _ := getValue(string(checkJson), "$_.value")
 	actual, err := getValue(payload, check.Field)
 	if err != nil {
-		res.Error = err
-		return res
+		return false, "", fmt.Errorf("failed to get values from payload")
 	}
 
-	// Check processesing
-	res.Status = CHECK_DONE
-	if match := compareTypes(expected, actual); !match {
-		res.Error = errors.New("type mismatch")
-		return res
+	// Need to perform types comparison before
+	if res := compareTypes(expected, actual); !res {
+		return false, "type mismatch", nil
 	}
 
-	res.Match = compareComplex(expected, actual)
-	if !res.Match {
-		res.Error = fmt.Errorf("different values")
+	if !compareComplex(expected, actual) {
+		return false, "different values", nil
 	}
+	return true, "equal values", nil
 
-	return res
 }
