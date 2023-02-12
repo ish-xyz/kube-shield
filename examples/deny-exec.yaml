@@ -2,13 +2,15 @@ apiVersion: kube-shield.red-labs.co.uk/v1
 kind: Policy
 metadata:
   name: deny-exec
+  namespace: default
 spec:
   applyOn:
   - apiGroup: ""
     resource: "pods/exec"
     verb: "connect"
   rules:
-  - name: rule-name
+  - name: pod-in-default-ns
+    # request is a pre-populated variable with the value of the apiserver payload
     script: |
       if request.namespace == "default" and request.name == "po" then
         return false, "pod 'po' contains sensitive information"
