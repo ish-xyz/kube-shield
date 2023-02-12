@@ -26,7 +26,7 @@ end
 	fnBody = `
 payload = getInput()
 %s
-return false, "check failed"
+return false, "default error"
 `
 )
 
