@@ -24,7 +24,7 @@ function evaluate()
 end
 `
 	fnBody = `
-payload = getInput()
+request = getInput()
 %s
 return false, "default error"
 `
