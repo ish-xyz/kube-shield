@@ -34,6 +34,7 @@ func init() {
 	Cmd.Flags().StringP("tls-cert", "p", "/var/ssl/server.crt", "path to the server TLS certificate")
 	Cmd.Flags().StringP("tls-key", "i", "/var/ssl/server.key", "path to the server TLS key")
 	Cmd.Flags().StringP("address", "a", ":8000", "address of the web server")
+	Cmd.Flags().BoolP("debug", "d", false, "Run in debug mode")
 	Cmd.Flags().Bool("ipv4", false, "Run web server on ipv4")
 	Cmd.Flags().BoolVarP(&printVersion, "version", "v", false, "Print version of kube-shield")
 
@@ -43,6 +44,7 @@ func init() {
 	viper.BindPFlag("tls-key", Cmd.Flags().Lookup("tls-key"))
 	viper.BindPFlag("address", Cmd.Flags().Lookup("address"))
 	viper.BindPFlag("ipv4", Cmd.Flags().Lookup("ipv4"))
+	viper.BindPFlag("debug", Cmd.Flags().Lookup("debug"))
 }
 
 // Start the admission controller here
@@ -51,6 +53,11 @@ func start(cmd *cobra.Command, args []string) {
 	if printVersion {
 		fmt.Println(Version)
 		os.Exit(0)
+	}
+
+	if viper.GetBool("debug") {
+		logrus.Infoln("setting logrus in debug mode")
+		logrus.SetLevel(logrus.DebugLevel)
 	}
 
 	// try in-cluster kubeconfig

@@ -7,33 +7,11 @@ import (
 
 	v1 "github.com/RedLabsPlatform/kube-shield/pkg/apis/v1"
 	"github.com/RedLabsPlatform/kube-shield/pkg/cache"
-	"github.com/RedLabsPlatform/kube-shield/pkg/engine/operators"
-	"github.com/sirupsen/logrus"
+	"github.com/RedLabsPlatform/kube-shield/pkg/engine/lua"
 	admissionv1 "k8s.io/api/admission/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime"
 )
-
-// Checks are in AND, so if any of the checks don't match the desired result it returns an error
-// Nil error means that the checks have been successful
-func runChecks(req *admissionv1.AdmissionRequest, desiredResult bool, checks []*v1.Check) error {
-
-	for _, check := range checks {
-		jsonReq, err := json.Marshal(req)
-		if err != nil {
-			return err
-		}
-		checkRes := operators.Run(string(jsonReq), check)
-		if checkRes.Error != nil {
-			logrus.Errorf("engine failed while executing check %v", checkRes.Error)
-			return fmt.Errorf("engine failed while executing check %v", checkRes.Error)
-		}
-		if checkRes.Result != desiredResult {
-			return checkRes.Error
-		}
-	}
-	return nil
-}
 
 // Rules are in OR, so if any of the rules have passed, the function returns a nil error
 func runRules(req *admissionv1.AdmissionRequest, policy *v1.Policy) error {
@@ -45,18 +23,22 @@ func runRules(req *admissionv1.AdmissionRequest, policy *v1.Policy) error {
 		* DenyIfMatch  == AllowIfMatch (default) -> false
 		  (if all checks are false, pass)
 	*/
-	var err error
-	desiredResult := policy.Spec.DefaultBehaviour == v1.DEFAULT_BEHAVIOUR
+	var lastRule string
 
 	for _, rule := range policy.Spec.Rules {
+		lastRule = rule.Name
+		jsonReq, err := json.Marshal(req)
+		if err != nil {
+			return err
+		}
 
-		err = runChecks(req, desiredResult, rule.Checks)
-		if err == nil {
-			return nil
+		res, err := lua.Execute(string(jsonReq), rule.Script)
+		if !res {
+			return fmt.Errorf("\nDenied by policy: '%s'\nrule: '%s'\nerror: '%v'\n ", policy.Name, lastRule, err)
 		}
 	}
 
-	return fmt.Errorf("\nDenied by policy '%s'.\nbehaviour is '%s', %v", policy.Name, policy.Spec.DefaultBehaviour, err)
+	return nil
 }
 
 func (e *Engine) RunNamespacePolicies(req *admissionv1.AdmissionRequest) error {
@@ -74,6 +56,7 @@ func (e *Engine) RunNamespacePolicies(req *admissionv1.AdmissionRequest) error {
 		obj, exists, err := store.GetByKey(policyKey)
 		if err != nil || !exists {
 			e.Logger.Errorf("failed to get policy with key '%s'", policyKey)
+			//TODO: I think it should exit here
 			continue
 		}
 
@@ -83,6 +66,7 @@ func (e *Engine) RunNamespacePolicies(req *admissionv1.AdmissionRequest) error {
 		)
 		if err != nil {
 			e.Logger.Errorf("failed to convert policy with key '%s' into object", policyKey)
+			//TODO: I think it should exit here
 			continue
 		}
 

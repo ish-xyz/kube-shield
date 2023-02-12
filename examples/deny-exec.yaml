@@ -7,10 +7,11 @@ spec:
   - apiGroup: ""
     resource: "pods/exec"
     verb: "connect"
-  defaultBehaviour: DenyIfMatch
   rules:
   - name: rule-name
-    checks:
-    - field: $_.namespace
-      operator: Equal
-      value: default
+    script: |
+      if payload.namespace == "default" then
+        return false
+      else
+        return true
+      end

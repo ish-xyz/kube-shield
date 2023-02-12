@@ -18,9 +18,7 @@ type PolicyStatus struct {
 }
 
 type PolicySpec struct {
-	// +kubebuilder:default=AllowIfMatch
-	// +kubebuilder:validation:Enum=AllowIfMatch;DenyIfMatch
-	DefaultBehaviour string `json:"defaultBehaviour"`
+
 	// +kubebuilder:validation:Required
 	ApplyOn []*Definition `json:"applyOn"`
 	// +kubebuilder:validation:MaxItems=500
@@ -34,9 +32,7 @@ type Rule struct {
 	// +kubebuilder:validation:Required
 	Name string `json:"name"`
 	// +kubebuilder:validation:Required
-	// +kubebuilder:validation:MaxItems=500
-	// +kubebuilder:validation:MinItems=1
-	Checks []*Check `json:"checks"`
+	Script string `json:"script"`
 }
 
 // +kubebuilder:object:root=true
@@ -54,25 +50,6 @@ type Definition struct {
 	Resource string `json:"resource"`
 	// +kubebuilder:validation:Required
 	Verb string `json:"verb"`
-}
-
-type Check struct {
-	// +kubebuilder:validation:Required
-	// +kubebuilder:validation:Pattern=^\$_\..*$
-	Field string `json:"field"`
-	// +kubebuilder:validation:Required
-	// +kubebuilder:validation:Enum=GreaterThan;LowerThan;Equal;NotEqual;Regex;Count
-	Operator string `json:"operator"`
-
-	// +kubebuilder:validation:Required
-	// +kubebuilder:validation:XPreserveUnknownFields
-	Value interface{} `json:"value"`
-}
-
-type CheckResult struct {
-	Message string
-	Result  bool
-	Error   error
 }
 
 func init() {

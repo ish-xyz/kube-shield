@@ -57,38 +57,14 @@ spec:
               rules:
                 items:
                   properties:
-                    checks:
-                      items:
-                        properties:
-                          field:
-                            pattern: ^\$_\..*$
-                            type: string
-                          operator:
-                            enum:
-                            - GreaterThan
-                            - LowerThan
-                            - Equal
-                            - NotEqual
-                            - Regex
-                            - Count
-                            type: string
-                          value:
-                            type: string
-                            x-kubernetes-preserve-unknown-fields: true
-                        required:
-                        - field
-                        - operator
-                        - value
-                        type: object
-                      maxItems: 500
-                      minItems: 1
-                      type: array
                     name:
                       pattern: ^[a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*$
                       type: string
+                    script:
+                      type: string
                   required:
-                  - checks
                   - name
+                  - script
                   type: object
                 maxItems: 500
                 minItems: 1
