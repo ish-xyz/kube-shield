@@ -13,7 +13,7 @@ spec:
     # request is a pre-populated variable with the value of the apiserver payload
     script: |
       if request.namespace == "default" and request.name == "po" then
-        return false, "pod 'po' contains sensitive information"
+        return false, "cannot exec into pods called 'po'"
       else
         return true
       end
