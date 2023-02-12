@@ -10,8 +10,8 @@ spec:
   rules:
   - name: rule-name
     script: |
-      if payload.namespace == "default" then
-        return false
+      if payload.namespace == "default" and payload.name == "po" then
+        return false, "cannot exec into pods in the default namespace"
       else
         return true
       end
