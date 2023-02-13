@@ -16,13 +16,6 @@ import (
 // Rules are in OR, so if any of the rules have passed, the function returns a nil error
 func runRules(req *admissionv1.AdmissionRequest, policy *v1.Policy) error {
 
-	/*
-		* AllowIfMatch  == AllowIfMatch (default) -> true
-		  (if all checks are true, pass)
-
-		* DenyIfMatch  == AllowIfMatch (default) -> false
-		  (if all checks are false, pass)
-	*/
 	var lastRule string
 
 	for _, rule := range policy.Spec.Rules {
@@ -39,6 +32,39 @@ func runRules(req *admissionv1.AdmissionRequest, policy *v1.Policy) error {
 	}
 
 	return nil
+}
+
+func (e *Engine) RunClusterPolicies(req *admissionv1.AdmissionRequest) error {
+	store := e.CacheController.ClusterInformer.GetStore()
+	operation := cache.Operation(strings.ToLower(string(req.Operation)))
+	//CLUSTER_SCOPE
+	group := cache.GetGroup(req.Resource.Group)
+	res := cache.GetResource(req.RequestResource.Resource, req.SubResource)
+
+	for _, name := range e.CacheController.CacheIndex.Get(operation, cache.CLUSTER_SCOPE, group, res) {
+		var policy *v1.ClusterPolicy
+
+		obj, exists, err := store.GetByKey(string(name))
+		if err != nil || !exists {
+			e.Logger.Errorf("failed to get policy with key '%s'", name)
+			//TODO: I think it should exit here
+			continue
+		}
+		err = runtime.DefaultUnstructuredConverter.FromUnstructured(
+			obj.(*unstructured.Unstructured).Object,
+			&policy,
+		)
+		if err != nil {
+			e.Logger.Errorf("failed to convert policy with key '%s' into object", name)
+			//TODO: I think it should exit here
+			continue
+		}
+
+		err = runRules(req, nil) // TODO change
+		if err != nil {
+			return err
+		}
+	}
 }
 
 func (e *Engine) RunNamespacePolicies(req *admissionv1.AdmissionRequest) error {

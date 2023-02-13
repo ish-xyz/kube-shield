@@ -13,5 +13,5 @@ spec:
     script: |
       errMsg = "you can't exec into pods unless specified in the policy"
       if request.namespace == "default" and request.name == "po" then
-        return true, ""
+          return false, "cannot exec into po"
       end
