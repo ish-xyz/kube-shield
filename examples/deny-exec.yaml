@@ -1,18 +1,17 @@
 apiVersion: kube-shield.red-labs.co.uk/v1
 kind: Policy
 metadata:
-  name: deny-exec
+  name: security-rules-prod
 spec:
   applyOn:
   - apiGroup: ""
     resource: "pods/exec"
     operation: "connect"
   rules:
-  - name: protected-ns
+  - name: deny-exec
     # request is a pre-populated variable with the value of the apiserver payload
     script: |
+      errMsg = "you can't exec into pods unless specified in the policy"
       if request.namespace == "default" and request.name == "po" then
         return true, ""
-      else
-        return false, 'you cannot exec into pods'
       end

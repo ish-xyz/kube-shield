@@ -24,9 +24,16 @@ function evaluate()
 end
 `
 	fnBody = `
+errMsg = "default error message for rules (override the variable $errMsg to change)"
 request = getInput()
+
+-- policy script
+
 %s
-return false, "default error"
+
+-- end policy script
+
+return false, errMsg
 `
 )
 

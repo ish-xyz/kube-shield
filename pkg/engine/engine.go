@@ -34,7 +34,7 @@ func runRules(req *admissionv1.AdmissionRequest, policy *v1.Policy) error {
 
 		res, err := lua.Execute(string(jsonReq), rule.Script)
 		if !res {
-			return fmt.Errorf("\nDenied by policy: '%s'\nrule: '%s'\nerror: '%v'\n ", policy.Name, lastRule, err)
+			return fmt.Errorf("\n\nDenied by policy: '%s'\nrule: '%s'\nerror: '%v'\n ", policy.Name, lastRule, err)
 		}
 	}
 
