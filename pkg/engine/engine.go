@@ -44,14 +44,15 @@ func runRules(req *admissionv1.AdmissionRequest, policy *v1.Policy) error {
 func (e *Engine) RunNamespacePolicies(req *admissionv1.AdmissionRequest) error {
 
 	store := e.CacheController.NamespaceInformer.GetStore()
-	verb := cache.Verb(strings.ToLower(string(req.Operation)))
+	operation := cache.Operation(strings.ToLower(string(req.Operation)))
 	ns := cache.Namespace(req.Namespace)
 	group := cache.GetGroup(req.Resource.Group)
 	res := cache.GetResource(req.RequestResource.Resource, req.SubResource)
 
-	for _, name := range e.CacheController.CacheIndex.Get(verb, ns, group, res) {
+	for _, name := range e.CacheController.CacheIndex.Get(operation, ns, group, res) {
 
 		var policy *v1.Policy
+
 		policyKey := fmt.Sprintf("%s/%s", ns, name)
 		obj, exists, err := store.GetByKey(policyKey)
 		if err != nil || !exists {

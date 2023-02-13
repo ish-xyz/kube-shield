@@ -31,8 +31,6 @@ const (
 
 	// Policy Kind (string)
 	POLICY_KIND = "policies"
-
-	DEFAULT_BEHAVIOUR = "AllowIfMatch"
 )
 
 var (

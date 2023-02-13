@@ -11,7 +11,7 @@ const (
 	CORE_GROUP    = "_core"
 )
 
-type Verb string
+type Operation string
 
 type Namespace string
 
@@ -23,7 +23,7 @@ type PolicyName string
 
 type CacheIndex struct {
 	sync.Mutex
-	Policies map[Verb]map[Namespace]map[Group]map[Resource][]PolicyName
+	Policies map[Operation]map[Namespace]map[Group]map[Resource][]PolicyName
 }
 
 type Controller struct {

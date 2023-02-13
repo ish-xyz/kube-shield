@@ -11,7 +11,7 @@ import (
 func NewCacheIndex() *CacheIndex {
 
 	return &CacheIndex{
-		Policies: make(map[Verb]map[Namespace]map[Group]map[Resource][]PolicyName),
+		Policies: make(map[Operation]map[Namespace]map[Group]map[Resource][]PolicyName),
 	}
 }
 
@@ -19,7 +19,7 @@ func NewCacheIndex() *CacheIndex {
 func (c *CacheIndex) Delete(entries []*v1.Definition, namespace, name string) {
 	for _, def := range entries {
 		c.DeleteSingleEntry(
-			Verb(def.Verb),
+			Operation(def.Operation),
 			Namespace(namespace),
 			GetGroup(def.Group),
 			Resource(def.Resource),
@@ -32,7 +32,7 @@ func (c *CacheIndex) Delete(entries []*v1.Definition, namespace, name string) {
 func (c *CacheIndex) Add(entries []*v1.Definition, namespace, name string) {
 	for _, def := range entries {
 		c.AddSingleEntry(
-			Verb(def.Verb),
+			Operation(def.Operation),
 			Namespace(namespace),
 			GetGroup(def.Group),
 			Resource(def.Resource),
@@ -41,44 +41,44 @@ func (c *CacheIndex) Add(entries []*v1.Definition, namespace, name string) {
 	}
 }
 
-func (c *CacheIndex) AddSingleEntry(verb Verb, ns Namespace, grp Group, res Resource, name PolicyName) {
+func (c *CacheIndex) AddSingleEntry(ops Operation, ns Namespace, grp Group, res Resource, name PolicyName) {
 
-	if _, ok := c.Policies[verb]; !ok {
-		c.Policies[verb] = make(map[Namespace]map[Group]map[Resource][]PolicyName)
+	if _, ok := c.Policies[ops]; !ok {
+		c.Policies[ops] = make(map[Namespace]map[Group]map[Resource][]PolicyName)
 	}
 
-	if _, ok := c.Policies[verb][ns]; !ok {
-		c.Policies[verb][ns] = make(map[Group]map[Resource][]PolicyName)
+	if _, ok := c.Policies[ops][ns]; !ok {
+		c.Policies[ops][ns] = make(map[Group]map[Resource][]PolicyName)
 	}
 
-	if _, ok := c.Policies[verb][ns][grp]; !ok {
-		c.Policies[verb][ns][grp] = make(map[Resource][]PolicyName)
+	if _, ok := c.Policies[ops][ns][grp]; !ok {
+		c.Policies[ops][ns][grp] = make(map[Resource][]PolicyName)
 	}
 
-	if _, ok := c.Policies[verb][ns][grp][res]; !ok {
-		c.Policies[verb][ns][grp][res] = []PolicyName{name}
+	if _, ok := c.Policies[ops][ns][grp][res]; !ok {
+		c.Policies[ops][ns][grp][res] = []PolicyName{name}
 	} else {
-		c.Policies[verb][ns][grp][res] = append(c.Policies[verb][ns][grp][res], name)
+		c.Policies[ops][ns][grp][res] = append(c.Policies[ops][ns][grp][res], name)
 	}
 }
 
-func (c *CacheIndex) DeleteSingleEntry(verb Verb, ns Namespace, grp Group, res Resource, name PolicyName) {
-	if _, exists := c.Policies[verb][ns][grp][res]; exists {
+func (c *CacheIndex) DeleteSingleEntry(ops Operation, ns Namespace, grp Group, res Resource, name PolicyName) {
+	if _, exists := c.Policies[ops][ns][grp][res]; exists {
 		var newPoliciesArr []PolicyName
-		for _, cachedPolicyName := range c.Policies[verb][ns][grp][res] {
+		for _, cachedPolicyName := range c.Policies[ops][ns][grp][res] {
 			if cachedPolicyName != name {
 				newPoliciesArr = append(newPoliciesArr, cachedPolicyName)
 			}
 		}
-		c.Policies[verb][ns][grp][res] = newPoliciesArr
+		c.Policies[ops][ns][grp][res] = newPoliciesArr
 	}
 }
 
-func (c *CacheIndex) Get(verb Verb, ns Namespace, grp Group, res Resource) []PolicyName {
+func (c *CacheIndex) Get(ops Operation, ns Namespace, grp Group, res Resource) []PolicyName {
 
-	if _, ok := c.Policies[verb][ns][grp][res]; !ok {
+	if _, ok := c.Policies[ops][ns][grp][res]; !ok {
 		return []PolicyName{}
 	} else {
-		return c.Policies[verb][ns][grp][res]
+		return c.Policies[ops][ns][grp][res]
 	}
 }

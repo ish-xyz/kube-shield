@@ -18,7 +18,6 @@ type PolicyStatus struct {
 }
 
 type PolicySpec struct {
-
 	// +kubebuilder:validation:Required
 	ApplyOn []*Definition `json:"applyOn"`
 	// +kubebuilder:validation:MaxItems=500
@@ -49,7 +48,7 @@ type Definition struct {
 	// +kubebuilder:validation:Required
 	Resource string `json:"resource"`
 	// +kubebuilder:validation:Required
-	Verb string `json:"verb"`
+	Operation string `json:"operation"`
 }
 
 func init() {

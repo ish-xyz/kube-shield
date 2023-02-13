@@ -13,9 +13,6 @@ type ClusterPolicy struct {
 }
 
 type ClusterPolicySpec struct {
-	// +kubebuilder:default=DenyIfMatch
-	// +kubebuilder:validation:Enum=AllowIfMatch;DenyIfMatch
-	DefaultBehaviour string `json:"defaultBehaviour"`
 	// +kubebuilder:validation:Required
 	ApplyOn []*Definition `json:"applyOn"`
 	// +kubebuilder:validation:MaxItems=500
