@@ -14,11 +14,11 @@ import (
 )
 
 // Rules are in OR, so if any of the rules have passed, the function returns a nil error
-func runRules(req *admissionv1.AdmissionRequest, policy *v1.Policy) error {
+func runRules(req *admissionv1.AdmissionRequest, name string, rules []*v1.Rule) error {
 
 	var lastRule string
 
-	for _, rule := range policy.Spec.Rules {
+	for _, rule := range rules {
 		lastRule = rule.Name
 		jsonReq, err := json.Marshal(req)
 		if err != nil {
@@ -27,17 +27,18 @@ func runRules(req *admissionv1.AdmissionRequest, policy *v1.Policy) error {
 
 		res, err := lua.Execute(string(jsonReq), rule.Script)
 		if !res {
-			return fmt.Errorf("\n\nDenied by policy: '%s'\nrule: '%s'\nerror: '%v'\n ", policy.Name, lastRule, err)
+			return fmt.Errorf("\n\nDenied by policy: '%s'\nrule: '%s'\nerror: '%v'\n ", name, lastRule, err)
 		}
 	}
 
 	return nil
 }
 
+// Run Cluster Policies
 func (e *Engine) RunClusterPolicies(req *admissionv1.AdmissionRequest) error {
+
 	store := e.CacheController.ClusterInformer.GetStore()
 	operation := cache.Operation(strings.ToLower(string(req.Operation)))
-	//CLUSTER_SCOPE
 	group := cache.GetGroup(req.Resource.Group)
 	res := cache.GetResource(req.RequestResource.Resource, req.SubResource)
 
@@ -60,13 +61,15 @@ func (e *Engine) RunClusterPolicies(req *admissionv1.AdmissionRequest) error {
 			continue
 		}
 
-		err = runRules(req, nil) // TODO change
+		err = runRules(req, policy.Name, policy.Spec.Rules)
 		if err != nil {
 			return err
 		}
 	}
+	return nil
 }
 
+// Run Policies
 func (e *Engine) RunNamespacePolicies(req *admissionv1.AdmissionRequest) error {
 
 	store := e.CacheController.NamespaceInformer.GetStore()
@@ -83,7 +86,8 @@ func (e *Engine) RunNamespacePolicies(req *admissionv1.AdmissionRequest) error {
 		obj, exists, err := store.GetByKey(policyKey)
 		if err != nil || !exists {
 			e.Logger.Errorf("failed to get policy with key '%s'", policyKey)
-			//TODO: I think it should exit here
+			//TODO: should try to reconcile and clean the index or wait for the cache to refresh
+			//TODO: add metrics "failed_loading{policy_name="", etc}"
 			continue
 		}
 
@@ -93,11 +97,11 @@ func (e *Engine) RunNamespacePolicies(req *admissionv1.AdmissionRequest) error {
 		)
 		if err != nil {
 			e.Logger.Errorf("failed to convert policy with key '%s' into object", policyKey)
-			//TODO: I think it should exit here
+			//TODO: add metrics "failed_loading{policy_name="", etc}"
 			continue
 		}
 
-		err = runRules(req, policy)
+		err = runRules(req, policy.Name, policy.Spec.Rules)
 		if err != nil {
 			return err
 		}
