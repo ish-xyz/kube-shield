@@ -67,7 +67,7 @@ func (s *Server) ServeValidate(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = s.Engine.RunNamespacePolicies(admissionReview.Request)
+	err = s.Engine.Run(admissionReview.Request)
 	if err != nil {
 		admissionResponse.Allowed = false
 		admissionResponse.Result = &metav1.Status{
