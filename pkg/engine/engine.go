@@ -51,9 +51,9 @@ func (e *Engine) Run(req *admissionv1.AdmissionRequest) error {
 			continue
 		}
 
-		err = evaluateRules(req, string(name), spec.Rules)
+		err = evaluateRules(req, spec.Rules)
 		if err != nil {
-			return err
+			return fmt.Errorf("\n\nDenied by policy: '%s'\n%v", name, err)
 		}
 	}
 
@@ -61,7 +61,7 @@ func (e *Engine) Run(req *admissionv1.AdmissionRequest) error {
 }
 
 // Rules are in OR, so if any of the rules have passed, the function returns a nil error
-func evaluateRules(req *admissionv1.AdmissionRequest, name string, rules []*v1.Rule) error {
+func evaluateRules(req *admissionv1.AdmissionRequest, rules []*v1.Rule) error {
 
 	var lastRule string
 
@@ -74,7 +74,7 @@ func evaluateRules(req *admissionv1.AdmissionRequest, name string, rules []*v1.R
 
 		res, err := lua.Execute(string(jsonReq), rule.Script)
 		if !res {
-			return fmt.Errorf("\n\nDenied by policy: '%s'\nrule: '%s'\nerror: '%v'\n ", name, lastRule, err)
+			return fmt.Errorf("rule: '%s'\nerror: '%v'\n ", lastRule, err)
 		}
 	}
 
