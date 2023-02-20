@@ -2,7 +2,6 @@ package engine
 
 import (
 	"github.com/RedLabsPlatform/kube-shield/pkg/cache"
-	"github.com/sirupsen/logrus"
 )
 
 type Engine struct {
@@ -12,6 +11,4 @@ type Engine struct {
 
 	// By default the webhook fails when an invalid check is encountered, this behaviour can be changed here
 	SkipInvalidChecks bool
-
-	Logger logrus.Entry
 }
